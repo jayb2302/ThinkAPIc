@@ -11,23 +11,23 @@ const MONGO_URI = process.env.MONGO_URI as string;
 
 async function seedDatabase() {
   try {
-    // Connect to MongoDB
+    // ✅ Connect to MongoDB
     await mongoose.connect(MONGO_URI);
     console.log("✅ Connected to MongoDB");
 
-    // Clear existing data if any
+    // ✅ Clear existing data
     await Topic.deleteMany({});
     await Course.deleteMany({});
     console.log("🗑️ Existing data cleared");
 
-    // Create API Course
+    // ✅ Create API Course
     const apiCourse = await Course.create({
       title: "REST API Development",
       description: "The purpose of this course is to introduce and train students in REST API development, including API design, implementation, and testing.",
       teacher: "Søren Spangsberg Jørgensen",
       scope: "5 ECTS",
-			semester: "2nd Semester",
-			learningObjectives: [
+      semester: "2nd Semester",
+      learningObjectives: [
         "Understand API and REST API concepts",
         "Learn how REST APIs fit into web development",
         "Understand HTTP methods, requests, and responses",
@@ -49,8 +49,8 @@ async function seedDatabase() {
 
     console.log(`📚 Created Course: ${apiCourse.title}`);
 
-    // Topics Data
-    const topics = [
+    // ✅ Insert Topics & Collect their IDs
+    const topics = await Topic.insertMany([
       {
         title: "Introduction to REST API",
         week: 5,
@@ -146,13 +146,18 @@ async function seedDatabase() {
         resources: [],
         course: apiCourse._id,
       },
-    ];
+    ]);
 
-    // Insert topics into MongoDB
-    await Topic.insertMany(topics);
     console.log("✅ Topics Seeded Successfully!");
 
-    // Close the connection
+    // ✅ Update Course with Topics
+    await Course.findByIdAndUpdate(apiCourse._id, {
+      $set: { topics: topics.map(topic => topic._id) }
+    });
+
+    console.log(`📚 Updated Course with Topics: ${apiCourse.title}`);
+
+    // ✅ Close the connection
     mongoose.connection.close();
     console.log("🔌 MongoDB Connection Closed");
   } catch (error) {
@@ -161,5 +166,5 @@ async function seedDatabase() {
   }
 }
 
-// Run the seed function
+// ✅ Run the seed function
 seedDatabase();
