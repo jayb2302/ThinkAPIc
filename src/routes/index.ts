@@ -1,10 +1,10 @@
 import { Router, Request, Response } from "express";
 import courseRoutes from "./courseRoutes";
 import topicRoutes from "./topicRoutes";
+import userRoutes from "./userRoutes";
+import authRoutes from "./authRoutes";
 
 const router: Router = Router();
-
-// Get, Post, Put, Delete (CRUD)
 
 // Base API route
 router.get("/", (req: Request, res: Response) => {
@@ -12,8 +12,9 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 // Other routes
+router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
 router.use("/courses", courseRoutes);
 router.use("/topics", topicRoutes);
-
 
 export default router;
