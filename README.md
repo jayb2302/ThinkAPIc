@@ -111,7 +111,7 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 #### Sample Response
-```
+```json
 {
   "_id": "679a893cad0abb4004983c72",
   "title": "Understanding HTTP Methods",
