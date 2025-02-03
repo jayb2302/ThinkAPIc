@@ -1,13 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose";
-
-export interface ITopic extends Document {
-  title: string;
-  week: number;
-  summary: string;
-  key_points: string[];
-  resources: { title: string; link: string }[];
-  course: mongoose.Schema.Types.ObjectId;
-}
+import mongoose, { Schema } from "mongoose";
+import { ITopic } from "../interfaces/ITopic";
 
 const TopicSchema = new Schema<ITopic>(
   {
@@ -22,6 +14,8 @@ const TopicSchema = new Schema<ITopic>(
       },
     ],
     course: { type: Schema.Types.ObjectId, ref: "Course" },
-  }, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 export default mongoose.model<ITopic>("Topic", TopicSchema);

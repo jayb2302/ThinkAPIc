@@ -1,9 +1,10 @@
 import express from "express";
+import { authenticateUser } from "../middleware/authMiddleware"; 
 import { getCourses, getCourseById, createCourse, updateCourse, deleteCourse } from "../controllers/courseController";
 
 const router = express.Router();
 
-// Use controllers directly (no need for `as RequestHandler`)
+// Public routes
 router.get("/", getCourses);
 router.get("/:id", getCourseById);
 router.post("/", createCourse);

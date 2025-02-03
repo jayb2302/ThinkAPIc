@@ -1,16 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose";
-
-export interface ICourse extends Document {
-    title: string;
-    description: string;
-    teacher: string;
-    scope: string;
-    semester: string;
-    learningObjectives: string[];
-    skills: string[];
-    competencies: string[];
-    topics: mongoose.Schema.Types.ObjectId[];
-}
+import { Schema, model } from "mongoose";
+import { ICourse } from "../interfaces/ICourse"; 
 
 const CourseSchema = new Schema<ICourse>({
     title: { type: String, required: true, unique: true },
@@ -24,4 +13,4 @@ const CourseSchema = new Schema<ICourse>({
     topics: [{ type: Schema.Types.ObjectId, ref: "Topic" }],
 }, { timestamps: true });
 
-export default mongoose.model<ICourse>("Course", CourseSchema);
+export default model<ICourse>("Course", CourseSchema);
