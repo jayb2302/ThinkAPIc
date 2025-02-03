@@ -15,15 +15,15 @@ connectDB();
 
 
 // Routes
-app.use('/', routes);
+app.use('/api', routes);
 
-// Redirect to /api
-app.use((req, res, next) => {
-    if (!req.originalUrl.startsWith('/api')) {
-        return res.redirect(`/api${req.originalUrl}`);
-    }
-    next();
-});
+// // Redirect to /api
+// app.use((req, res, next) => {
+//     if (!req.originalUrl.startsWith('/api')) {
+//         return res.redirect(`/api${req.originalUrl}`);
+//     }
+//     next();
+// });
 
 export function startServer() {
     const PORT = process.env.PORT || 4000;
