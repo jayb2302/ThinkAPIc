@@ -3,6 +3,7 @@ import courseRoutes from "./courseRoutes";
 import topicRoutes from "./topicRoutes";
 import userRoutes from "./userRoutes";
 import authRoutes from "./authRoutes";
+import progressLogRoutes from "./progressLogRoutes";
 
 const router: Router = Router();
 
@@ -16,5 +17,6 @@ router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/courses", courseRoutes);
 router.use("/topics", topicRoutes);
+router.use("/progress", progressLogRoutes);
 
 export default router;
