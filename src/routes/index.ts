@@ -4,6 +4,7 @@ import topicRoutes from "./topicRoutes";
 import userRoutes from "./userRoutes";
 import authRoutes from "./authRoutes";
 import progressLogRoutes from "./progressLogRoutes";
+import quizRoutes from "./quizRoutes";
 
 const router: Router = Router();
 
@@ -18,5 +19,6 @@ router.use("/users", userRoutes);
 router.use("/courses", courseRoutes);
 router.use("/topics", topicRoutes);
 router.use("/progress", progressLogRoutes);
+router.use("/quizzes", quizRoutes);
 
 export default router;
