@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import User from "../models/User";
 
 // Get all users
-export const getUsers: RequestHandler = async (req, res) => {
+export const getUsers: RequestHandler = async (req, res): Promise<void> => {
     try {
         const users = await User.find().select("-password");
         res.status(200).json(users);
