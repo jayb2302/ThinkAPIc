@@ -4,7 +4,8 @@ import { IQuiz, IQuizOption } from "../interfaces/IQuiz";
 
 const QuizOptionSchema = new Schema<IQuizOption>({
     text: { type: String, required: true },
-    isCorrect: { type: Boolean, required: true, default: false }
+    isCorrect: { type: Boolean, required: true, default: false },
+    order: { type: Number, required: true }
 });
 
 const QuizSchema = new Schema<IQuiz>({
