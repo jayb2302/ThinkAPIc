@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 export interface AuthRequest extends Request {
-    user?: { userId: string; email: string; role:string };
+    user?: { _id: string; email: string; role:string };
 }
 
 // Secure Authentication Middleware
@@ -11,6 +11,7 @@ export const authenticateUser = (req: AuthRequest, res: Response, next: NextFunc
 
     // Validate token presence
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        console.error("❌ No Token Provided");
         res.status(401).json({ error: "Unauthorized: No Token Provided" });
         return;
     }
@@ -24,8 +25,12 @@ export const authenticateUser = (req: AuthRequest, res: Response, next: NextFunc
             email: string; 
             role: string;
         };
-
-        req.user = decoded;
+        console.log("✅ Decoded JWT:", decoded);
+        req.user = {
+            _id: decoded.userId,
+            email: decoded.email || "no-email",
+            role: decoded.role,
+        }
         next(); 
     } catch (error) {
         res.status(403).json({ error: "Invalid or Expired Token" });

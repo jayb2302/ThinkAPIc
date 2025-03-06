@@ -1,5 +1,5 @@
 import express from "express";
-import { getQuizzes, getQuizById, createQuiz, updateQuiz, deleteQuiz } from "../controllers/quizController";
+import { getQuizzes, getQuizById, createQuiz, updateQuiz, deleteQuiz, attemptQuiz } from "../controllers/quizController";
 import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
@@ -54,6 +54,8 @@ router.get("/", getQuizzes);
  */
 router.get("/:id", getQuizById);
 
+// Authenticated Routes
+router.post("/:id/attempt", authenticateUser, attemptQuiz);
 // Admin Routes
 /**
  * @swagger
@@ -134,5 +136,6 @@ router.put("/:id", authenticateUser, authorizeAdmin, updateQuiz);
  *         description: Quiz not found
  */
 router.delete("/:id", authenticateUser, authorizeAdmin, deleteQuiz);
+
 
 export default router;
