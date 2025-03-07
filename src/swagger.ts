@@ -177,6 +177,17 @@ export function setupDocs(app: Application) {
             },
           },
         },
+        QuizAttempt: {
+          type: "object",
+          required: ["userId", "quizId", "isCorrect", "score"],
+          properties: {
+            attemptId: { type: "string", description: "Quiz Attempt ID", example: "67a0ae68731a99cc163a7fc8" },
+            userId: { type: "string", description: "User ID who attempted the quiz", example: "67c4d034e1968c13a337c8c3" },
+            quizId: { type: "string", description: "Quiz ID being attempted", example: "67a9250ec86b3d5afdafa87e" },
+            isCorrect: { type: "boolean", description: "Whether the selected answer was correct", example: true },
+            completedAt: { type: "string", format: "date-time", description: "Time when the attempt was completed", example: "2025-02-10T12:30:00Z" }
+          },
+        },
       },
     },
   };
