@@ -3,7 +3,9 @@ import Quiz from "../models/Quiz";
 import Topic from "../models/Topic";
 import ProgressLog from "../models/ProgressLog";
 
-
+// ==========================
+// Helper Functions
+// ==========================
 
 // Validate Quiz Fields 
 const validateQuizFields = ({ topic, question, options }: IQuiz) => {
@@ -20,6 +22,7 @@ const validateQuizFields = ({ topic, question, options }: IQuiz) => {
   }
 };
 
+// Check if the topic exists
 const checkTopicExists = async (topicId: string) => {
   const topicExists = await Topic.exists({ _id: topicId });
   if (!topicExists) {
@@ -27,6 +30,7 @@ const checkTopicExists = async (topicId: string) => {
   }
 };
 
+// Check if at least one option is marked as correct
 const checkHasCorrectOption = (options: IQuiz["options"]) => {
   if (!options.some((opt) => opt.isCorrect)) {
     throw new Error("At least one option must be marked as correct.");
@@ -40,6 +44,7 @@ const validateQuizData = async (quizData: IQuiz) => {
   checkHasCorrectOption(quizData.options);
 };
 
+// Validate Quiz Update
 const validateQuizUpdate = (quizData: Partial<IQuiz>) => {
   if (!quizData.topic || !quizData.question || !quizData.options) {
     throw new Error(
@@ -69,6 +74,20 @@ const validateQuizAttempt = (
   }
 };
 
+
+// Format Options
+const formatOptions = (options: IQuiz["options"]) => {
+  return options.map((opt, index) => ({
+    text: opt.text.trim(),
+    isCorrect: Boolean(opt.isCorrect),
+    order: opt.order ?? index + 1,
+  }));
+};
+
+
+// ==========================
+// Quiz Service Functions
+// ==========================
 const getQuizWithTopic = async (quizId: string) => {
   const quiz = await Quiz.findById(quizId).populate("topic");
   if (!quiz) throw { status: 404, message: "Quiz not found" };
@@ -78,14 +97,6 @@ const getQuizWithTopic = async (quizId: string) => {
   }
 
   return { quiz, topicId: quiz.topic._id.toString() };
-};
-
-const formatOptions = (options: IQuiz["options"]) => {
-  return options.map((opt, index) => ({
-    text: opt.text.trim(),
-    isCorrect: Boolean(opt.isCorrect),
-    order: opt.order ?? index + 1,
-  }));
 };
 
 export const getAllQuizzes = async (): Promise<IQuiz[]> => {
