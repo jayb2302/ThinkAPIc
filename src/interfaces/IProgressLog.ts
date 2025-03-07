@@ -1,8 +1,8 @@
 import { Document, Types } from "mongoose";
 
 export enum ActivityType {
-    TOPICS = "topic",
-    QUIZZES = "quiz",
+    TOPIC = "topic",
+    QUIZ = "quiz",
     CODING = "coding",
     DEBUGGING = "debugging",
     CICD = "cicd",
