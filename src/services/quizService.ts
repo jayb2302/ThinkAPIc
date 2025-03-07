@@ -3,6 +3,91 @@ import Quiz from "../models/Quiz";
 import Topic from "../models/Topic";
 import ProgressLog from "../models/ProgressLog";
 
+
+
+// Validate Quiz Fields 
+const validateQuizFields = ({ topic, question, options }: IQuiz) => {
+  if (
+    !topic ||
+    !question ||
+    !options ||
+    !Array.isArray(options) ||
+    options.length < 2
+  ) {
+    throw new Error(
+      "All fields are required and options must contain at least two choices."
+    );
+  }
+};
+
+const checkTopicExists = async (topicId: string) => {
+  const topicExists = await Topic.exists({ _id: topicId });
+  if (!topicExists) {
+    throw new Error("Invalid topic ID: Topic does not exist.");
+  }
+};
+
+const checkHasCorrectOption = (options: IQuiz["options"]) => {
+  if (!options.some((opt) => opt.isCorrect)) {
+    throw new Error("At least one option must be marked as correct.");
+  }
+};
+
+// Validate the quiz data
+const validateQuizData = async (quizData: IQuiz) => {
+  validateQuizFields(quizData);
+  await checkTopicExists(quizData.topic.toString());
+  checkHasCorrectOption(quizData.options);
+};
+
+const validateQuizUpdate = (quizData: Partial<IQuiz>) => {
+  if (!quizData.topic || !quizData.question || !quizData.options) {
+    throw new Error(
+      "Topic, question, and options are required to update a quiz."
+    );
+  }
+};
+
+// Validate Quiz Attempt
+const validateQuizAttempt = (
+  data: Partial<{
+    userId: string;
+    quizId: string;
+    selectedOptionOrder: number;
+    courseId: string;
+  }>
+) => {
+  const missingFields = Object.entries(data)
+    .filter(([_, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingFields.length) {
+    throw {
+      status: 400,
+      message: `Missing required fields: ${missingFields.join(", ")}`,
+    };
+  }
+};
+
+const getQuizWithTopic = async (quizId: string) => {
+  const quiz = await Quiz.findById(quizId).populate("topic");
+  if (!quiz) throw { status: 404, message: "Quiz not found" };
+
+  if (!quiz.topic) {
+    throw { status: 400, message: "Quiz is missing an associated topic" };
+  }
+
+  return { quiz, topicId: quiz.topic._id.toString() };
+};
+
+const formatOptions = (options: IQuiz["options"]) => {
+  return options.map((opt, index) => ({
+    text: opt.text.trim(),
+    isCorrect: Boolean(opt.isCorrect),
+    order: opt.order ?? index + 1,
+  }));
+};
+
 export const getAllQuizzes = async (): Promise<IQuiz[]> => {
   const quizzes = await Quiz.find().populate("topic");
   quizzes.forEach((quiz) => quiz.options.sort((a, b) => a.order - b.order));
@@ -17,79 +102,41 @@ export const getQuizById = async (id: string): Promise<IQuiz | null> => {
 };
 
 export const createQuiz = async (quizData: IQuiz): Promise<IQuiz> => {
-  const { topic, question, options } = quizData;
-
-  // Validation
-  if (
-    !topic ||
-    !question ||
-    !options ||
-    !Array.isArray(options) ||
-    options.length < 2
-  ) {
-    throw new Error(
-      "All fields are required and options must contain at least two choices."
-    );
-  }
-
-  const topicExists = await Topic.findById(topic);
-  if (!topicExists) {
-    throw new Error("Invalid topic ID: Topic does not exist.");
-  }
-
-  const hasCorrectAnswer = options.some((opt) => opt.isCorrect);
-  if (!hasCorrectAnswer) {
-    throw new Error("At least one option must be marked as correct.");
-  }
-
-  const formattedOptions = options.map((opt, index: number) => ({
-    text: opt.text.trim(),
-    isCorrect: Boolean(opt.isCorrect),
-    order: opt.order ?? index + 1,
-  }));
-
+  await validateQuizData(quizData);
+  const formattedOptions = formatOptions(quizData.options);
   const newQuiz = await Quiz.create({
-    topic,
-    question,
+    ...quizData,
     options: formattedOptions,
   });
-
-  return await newQuiz.populate("topic");
+  return newQuiz;
 };
 
 export const updateQuiz = async (
   quizId: string,
   quizData: Partial<IQuiz>
 ): Promise<IQuiz | null> => {
-  const { topic, question, options } = quizData;
+  // Validate quiz update data
+  validateQuizUpdate(quizData);
 
-  if (
-    !topic ||
-    !question ||
-    !options ||
-    !Array.isArray(options) ||
-    options.length < 2
-  ) {
-    throw new Error("All fields required; minimum two options.");
-  }
+  // Validate topic format
+  const topicId =
+    typeof quizData.topic === "string"
+      ? new Topic({ _id: quizData.topic })._id
+      : quizData.topic;
 
-  const formattedOptions = options
-    .map((opt, index) => ({
-      text: opt.text.trim(),
-      isCorrect: Boolean(opt.isCorrect),
-      order: opt.order ?? index + 1,
-    }))
-    .sort((a, b) => a.order - b.order);
+  const formattedOptions = formatOptions(quizData.options!);
 
+  // Update quiz
   const updatedQuiz = await Quiz.findByIdAndUpdate(
     quizId,
-    { topic, question, options: formattedOptions },
+    { ...quizData, topic: topicId, options: formattedOptions },
     { new: true, runValidators: true }
   ).populate("topic");
 
   if (!updatedQuiz) {
     throw { status: 404, message: "Quiz not found" };
   }
+
   return updatedQuiz;
 };
 
@@ -100,68 +147,49 @@ export const deleteQuiz = async (id: string): Promise<IQuiz | null> => {
 };
 
 export const attemptQuiz = async ({
-    userId,
-    quizId,
-    selectedOptionOrder,
-    courseId,
-  }: {
-    userId: string;
-    quizId: string;
-    selectedOptionOrder: number;
-    courseId: string;
-  }): Promise<{ message: string; isCorrect: boolean; topicId: string | null }> => {
-  
-    // Validate required fields
-    if (!userId || !quizId || !selectedOptionOrder || !courseId) {
-      throw { status: 400, message: "Missing required fields: userId, quizId, selectedOptionOrder, courseId" };
-    }
-  
-    // Find the quiz and populate the topic field
-    const quiz = await Quiz.findById(quizId).populate("topic");
-  
-    console.log("📌 Debugging Quiz Attempt:");
-    console.log("✅ Fetched Quiz:", quiz);
-  
-    if (!quiz) {
-      throw { status: 404, message: "Quiz not found" };
-    }
-  
-    // Ensure the quiz has a topic
-    if (!quiz.topic) {
-      console.error(`⚠️ Quiz ${quizId} is missing a topic!`);
-      throw { status: 400, message: "Quiz is missing an associated topic" };
-    }
-  
-    console.log("✅ Topic Found:", quiz.topic);
-  
-    // Extract topic ID safely
-    const topicId = quiz.topic._id ? quiz.topic._id.toString() : null;
-  
-    if (!topicId) {
-      console.error(`❌ Topic ID is missing for quiz ${quizId}`);
-      throw { status: 500, message: "Topic ID is undefined" };
-    }
-  
-    // Find the selected option
-    const option = quiz.options.find((o) => o.order === selectedOptionOrder);
-    if (!option) {
-      throw { status: 400, message: "Invalid option selected. No matching option found for this quiz." };
-    }
-  
-    // Log the quiz attempt in ProgressLog
-    await ProgressLog.create({
-      user: userId,
-      course: courseId,
-      topic: topicId,
-      activityType: "quiz",
-      activityTable: "quizzes",
-      activityId: quiz._id,
-      completedAt: new Date(),
-    });
-  
-    return {
-      message: "Quiz attempt logged",
-      isCorrect: option.isCorrect,
-      topicId,
-    };
+  userId,
+  quizId,
+  selectedOptionOrder,
+  courseId,
+}: {
+  userId: string;
+  quizId: string;
+  selectedOptionOrder: number;
+  courseId: string;
+}): Promise<{
+  message: string;
+  isCorrect: boolean;
+  topicId: string | null;
+}> => {
+    validateQuizAttempt({ userId, quizId, selectedOptionOrder, courseId });
+
+    const { quiz, topicId } = await getQuizWithTopic(quizId);
+
+  console.log("📌 Debugging Quiz Attempt:");
+  console.log("✅ Fetched Quiz:", quiz);
+
+  console.log("✅ Topic Found:", quiz.topic);
+
+  // Find the selected option
+  const option = quiz.options.find((o) => o.order === selectedOptionOrder);
+  if (!option) {
+    throw { status: 400, message: "Invalid option selected. No matching option found for this quiz."};
+  }
+
+  // Log the quiz attempt in ProgressLog
+  await ProgressLog.create({
+    user: userId,
+    course: courseId,
+    topic: topicId,
+    activityType: "quiz",
+    activityTable: "quizzes",
+    activityId: quiz._id,
+    completedAt: new Date(),
+  });
+
+  return {
+    message: "Quiz attempt logged",
+    isCorrect: option.isCorrect,
+    topicId,
   };
+};
