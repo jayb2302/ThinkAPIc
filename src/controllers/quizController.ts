@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { RequestHandler, NextFunction } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
 import * as quizService from "../services/quizService";
 
@@ -23,6 +23,50 @@ export const getQuizById: RequestHandler = async (req, res): Promise<void> => {
     res.status(200).json(quiz);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch quiz" });
+  }
+};
+
+// Get quizzes by topic
+export const getQuizzesByTopic: RequestHandler = async (req, res): Promise<void> => {
+  try {
+    const { topicId } = req.params;
+    const quizzes = await quizService.getQuizzesByTopic(topicId);
+    res.status(200).json(quizzes);
+  } catch (error) {
+    console.error("❌ Error Fetching Quizzes by Topic:", error);
+    res.status(500).json({ error: "Failed to fetch quizzes for this topic" });
+  }
+};
+
+// Get user's quiz attempts
+export const getUserQuizAttempts: RequestHandler = async (req, res, next: NextFunction): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const attempts = await quizService.getUserQuizAttempts(userId);
+    res.status(200).json(attempts);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get Quiz Progress for a user
+export const getUserQuizProgress: RequestHandler = async (req, res, next): Promise<void> => {
+  try {
+    const { userId, courseId } = req.params;
+
+    // Call the service function
+    const progress = await quizService.getUserQuizProgress(userId, courseId);
+
+    // Handle case where no progress is found
+    if (!progress.length) {
+      res.status(404).json({ error: "No quiz progress found for this user in this course." });
+      return 
+    }
+
+    res.status(200).json(progress);
+  } catch (error) {
+    console.error("❌ Error Fetching Quiz Progress:", error);
+    next(error); // ✅ Passes error to the global error handler
   }
 };
 
@@ -156,3 +200,5 @@ export const attemptQuiz: RequestHandler = async (
     res.status(error.status || 500).json({ error: error.message });
   }
 };
+
+

@@ -1,6 +1,16 @@
 import express from "express";
-import { getQuizzes, getQuizById, createQuiz, updateQuiz, deleteQuiz, attemptQuiz } from "../controllers/quizController";
 import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
+import {
+    getQuizzes,
+    getQuizById,
+    getQuizzesByTopic,
+    getUserQuizAttempts,
+    getUserQuizProgress,
+    createQuiz,
+    updateQuiz,
+    deleteQuiz,
+    attemptQuiz
+  } from "../controllers/quizController";
 
 const router = express.Router();
 
@@ -53,9 +63,12 @@ router.get("/", getQuizzes);
  *         description: Quiz not found
  */
 router.get("/:id", getQuizById);
+router.get("/topic/:topicId", getQuizzesByTopic);
 
 // Authenticated Routes
 router.post("/:id/attempt", authenticateUser, attemptQuiz);
+router.get("/attempts/:userId", authenticateUser, getUserQuizAttempts);
+router.get("/progress/:userId/:courseId", authenticateUser, getUserQuizProgress);
 // Admin Routes
 /**
  * @swagger

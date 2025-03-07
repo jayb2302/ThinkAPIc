@@ -2,12 +2,17 @@ import { IQuiz } from "../interfaces/IQuiz";
 import Quiz from "../models/Quiz";
 import Topic from "../models/Topic";
 import ProgressLog from "../models/ProgressLog";
+import {
+  ActivityType,
+  IProgressLog,
+} from "../interfaces/IProgressLog";
+
 
 // ==========================
 // Helper Functions
 // ==========================
 
-// Validate Quiz Fields 
+// Validate Quiz Fields
 const validateQuizFields = ({ topic, question, options }: IQuiz) => {
   if (
     !topic ||
@@ -74,7 +79,6 @@ const validateQuizAttempt = (
   }
 };
 
-
 // Format Options
 const formatOptions = (options: IQuiz["options"]) => {
   return options.map((opt, index) => ({
@@ -83,7 +87,6 @@ const formatOptions = (options: IQuiz["options"]) => {
     order: opt.order ?? index + 1,
   }));
 };
-
 
 // ==========================
 // Quiz Service Functions
@@ -110,6 +113,117 @@ export const getQuizById = async (id: string): Promise<IQuiz | null> => {
   if (!quiz) throw { status: 404, message: "Quiz not found" };
   quiz.options.sort((a, b) => a.order - b.order);
   return quiz;
+};
+
+// Get all quizzes for a specific topic
+export const getQuizzesByTopic = async (topicId: string): Promise<IQuiz[]> => {
+  await checkTopicExists(topicId);
+
+  // Fetch quizzes and using lean() to return plain JS objects
+  const quizzes = await Quiz.find({ topic: topicId }).populate("topic").lean();
+
+  if (!quizzes.length) {
+    console.warn(`⚠️ No quizzes found for topic ID: ${topicId}`);
+    return [];
+  }
+
+  // Return quizzes with sorted options
+  return quizzes.map((quiz) => ({
+    ...quiz,
+    options: formatOptions(quiz.options),
+  }));
+};
+
+// Get User's Quiz Attempts
+export const getUserQuizAttempts = async (
+  userId: string
+): Promise<IProgressLog[]> => {
+  try {
+    const attempts = await ProgressLog.find({
+      user: userId,
+      activityType: ActivityType.QUIZ,
+    })
+      .populate({ path: "course", select: "title _id" })
+      .populate({ path: "topic", select: "title _id" })
+      .populate({ path: "activityId", select: "question" })
+      .lean();
+
+      if (!attempts.length) {
+        throw { status: 404, message: "No quiz attempts found for this user." };
+      }
+
+    return attempts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get User's Quiz Progress
+export const getUserQuizProgress = async (
+  userId: string,
+  courseId: string
+): Promise<IProgressLog[]> => {
+  return await ProgressLog.find({
+    user: userId,
+    course: courseId,
+    activityType: ActivityType.QUIZ,
+  })
+  .populate({ path: "activityId", model: "Quiz", select: "question" })
+  .populate({ path: "topic", model: "Topic", select: "title _id" })
+  .populate({ path: "course", select: "title _id" })
+    .lean();
+};
+
+export const attemptQuiz = async ({
+  userId,
+  quizId,
+  selectedOptionOrder,
+  courseId,
+}: {
+  userId: string;
+  quizId: string;
+  selectedOptionOrder: number;
+  courseId: string;
+}): Promise<{
+  message: string;
+  isCorrect: boolean;
+  topicId: string | null;
+}> => {
+  validateQuizAttempt({ userId, quizId, selectedOptionOrder, courseId });
+
+  const { quiz, topicId } = await getQuizWithTopic(quizId);
+
+  console.log("📌 Debugging Quiz Attempt:");
+  console.log("✅ Fetched Quiz:", quiz);
+
+  console.log("✅ Topic Found:", quiz.topic);
+
+  // Find the selected option
+  const option = quiz.options.find((o) => o.order === selectedOptionOrder);
+  if (!option) {
+    throw {
+      status: 400,
+      message:
+        "Invalid option selected. No matching option found for this quiz.",
+    };
+  }
+
+  // Log the quiz attempt in ProgressLog
+  await ProgressLog.create({
+    user: userId,
+    course: courseId,
+    topic: topicId,
+    activityType: "quiz",
+    activityTable: "quizzes",
+    activityId: quiz._id,
+    completedAt: new Date(),
+  });
+
+  return {
+    message: "Quiz attempt logged",
+    isCorrect: option.isCorrect,
+    topicId,
+  };
 };
 
 export const createQuiz = async (quizData: IQuiz): Promise<IQuiz> => {
@@ -155,52 +269,4 @@ export const deleteQuiz = async (id: string): Promise<IQuiz | null> => {
   const quiz = await Quiz.findByIdAndDelete(id);
   if (!quiz) throw { status: 404, message: "Quiz not found" };
   return quiz;
-};
-
-export const attemptQuiz = async ({
-  userId,
-  quizId,
-  selectedOptionOrder,
-  courseId,
-}: {
-  userId: string;
-  quizId: string;
-  selectedOptionOrder: number;
-  courseId: string;
-}): Promise<{
-  message: string;
-  isCorrect: boolean;
-  topicId: string | null;
-}> => {
-    validateQuizAttempt({ userId, quizId, selectedOptionOrder, courseId });
-
-    const { quiz, topicId } = await getQuizWithTopic(quizId);
-
-  console.log("📌 Debugging Quiz Attempt:");
-  console.log("✅ Fetched Quiz:", quiz);
-
-  console.log("✅ Topic Found:", quiz.topic);
-
-  // Find the selected option
-  const option = quiz.options.find((o) => o.order === selectedOptionOrder);
-  if (!option) {
-    throw { status: 400, message: "Invalid option selected. No matching option found for this quiz."};
-  }
-
-  // Log the quiz attempt in ProgressLog
-  await ProgressLog.create({
-    user: userId,
-    course: courseId,
-    topic: topicId,
-    activityType: "quiz",
-    activityTable: "quizzes",
-    activityId: quiz._id,
-    completedAt: new Date(),
-  });
-
-  return {
-    message: "Quiz attempt logged",
-    isCorrect: option.isCorrect,
-    topicId,
-  };
 };

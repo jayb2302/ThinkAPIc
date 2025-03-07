@@ -4,6 +4,7 @@ import cors from "cors";
 import { connectDB } from "./config/database";
 import routes from "./routes";
 import { setupDocs } from "./swagger";
+import { errorHandler } from "./utils/errorHandlers";
 
 dotenvFlow.config();
 
@@ -25,6 +26,8 @@ app.use(
 // Routes
 app.use("/api", routes);
 
+// Error Handler
+app.use(errorHandler);
 export function startServer() {
   // Connect to MongoDB
   connectDB();
