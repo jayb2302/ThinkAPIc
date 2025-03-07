@@ -1,16 +1,21 @@
 import mongoose, { Schema } from "mongoose";
-import { IProgressLog } from "../interfaces/IProgressLog";
+import { IProgressLog, ActivityType ,ActivityTable } from "../interfaces/IProgressLog";
 
 const ProgressLogSchema = new Schema<IProgressLog>({
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     course: { type: Schema.Types.ObjectId, ref: "Course", required: true },
+    topic: { type: Schema.Types.ObjectId },
     activityType: { 
         type: String, 
-        enum: ["topic", "quiz", "coding", "debugging", "cicd"], 
+        enum: Object.values(ActivityType),
         required: true 
     },
-    activityTable: { type: String, required: true }, 
-    activityId: { type: Schema.Types.ObjectId, required: true },
+    activityTable: { 
+        type: String,
+        enum: Object.values(ActivityTable), 
+        required: true 
+    }, 
+    activityId: { type: Schema.Types.ObjectId, required: true, index: true },
     completedAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 
