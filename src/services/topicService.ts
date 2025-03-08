@@ -18,10 +18,10 @@ const validateUserPermissions = (user: IUser): void => {
 };
 
 // Validate if topic exists
-const validateTopicExists = async (id: string): Promise<void> => {
-  const topic = await Topic.findById(id);
-  if (!topic) {
-    throw new Error("Topic not found.");
+const validateTopicExists = async (title: string): Promise<void> => {
+  const existingTopic = await Topic.findOne({ title });
+  if (existingTopic) {
+    throw new Error("A topic with this title already exists in the database.");
   }
 };
 
@@ -56,13 +56,13 @@ const hasInvalidResources = (
 
 // Validate Topic Fields
 const validateTopic = (data: Partial<ITopic>): string | null => {
-  return (
-    hasMissingFields(data) ??
-    (!isValidArray(data.key_points)
-      ? "Key points must be a non-empty array."
-      : null) ??
-    hasInvalidResources(data.resources)
-  );
+  console.log('Validating topic data:', data);  // Add this line to log the topic data
+
+  const { title, week, summary, key_points, resources } = data;
+  if (!title || !week || !summary || !key_points || !resources ) {
+      return "Missing required fields.";
+  }
+  return null;
 };
 
 // Validate Topic Update
@@ -93,6 +93,8 @@ export const getTopicById = async (id: string): Promise<ITopic | null> => {
 
 // Create a new topic
 export const createTopic = async (data: Partial<ITopic>): Promise<ITopic> => {
+  await validateTopicExists(data.title as string);
+
   const validationError = validateTopic(data);
   if (validationError) {
     throw new Error(validationError);
