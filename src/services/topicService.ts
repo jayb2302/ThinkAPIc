@@ -56,7 +56,7 @@ const hasInvalidResources = (
 
 // Validate Topic Fields
 const validateTopic = (data: Partial<ITopic>): string | null => {
-  console.log('Validating topic data:', data);  // Add this line to log the topic data
+  console.log('Validating topic data:', data); 
 
   const { title, week, summary, key_points, resources } = data;
   if (!title || !week || !summary || !key_points || !resources ) {

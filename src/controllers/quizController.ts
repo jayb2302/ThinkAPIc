@@ -184,11 +184,16 @@ export const attemptQuiz: RequestHandler = async (
     console.log("🔍 Checking req.user:", req.user); // Log the user object
     
     const userId = req.user._id;
-    const { quizId, selectedOptionOrder, courseId } = req.body;
+    const quizId = req.params.id;
+    const { selectedOptionOrder, courseId } = req.body;
 
-
+    if (!quizId || quizId === "null"){
+      console.error("❌ Quiz ID is missing in request params", quizId);
+      res.status(400).json({ error: "Quiz ID is required" });
+      return;
+    }
     console.log("📌 Quiz Attempt Request:", { userId, quizId, selectedOptionOrder, courseId });
-    const result = await quizService.attemptQuiz({ userId, quizId, selectedOptionOrder, courseId });
+    const result = await quizService.attemptQuiz(quizId,{ userId: req.user._id, selectedOptionOrder, courseId });
 
     res.status(201).json({
       message: '✅ Quiz attempt logged successfully',

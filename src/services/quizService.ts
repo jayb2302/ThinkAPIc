@@ -174,14 +174,14 @@ export const getUserQuizProgress = async (
     .lean();
 };
 
-export const attemptQuiz = async ({
+export const attemptQuiz = async (
+  quizId: string,
+  {
   userId,
-  quizId,
   selectedOptionOrder,
   courseId,
 }: {
   userId: string;
-  quizId: string;
   selectedOptionOrder: number;
   courseId: string;
 }): Promise<{
@@ -196,6 +196,10 @@ export const attemptQuiz = async ({
   console.log("📌 Debugging Quiz Attempt:");
   console.log("✅ Fetched Quiz:", quiz);
 
+  if (!quiz || !quiz.topic) {
+    console.error("❌ Quiz data is missing or corrupted:", quiz);
+    throw { status: 400, message: "Quiz data is invalid or missing associated topic" };
+  }
   console.log("✅ Topic Found:", quiz.topic);
 
   // Find the selected option
