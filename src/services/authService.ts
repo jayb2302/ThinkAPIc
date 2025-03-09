@@ -7,7 +7,7 @@ import { IUser } from "../interfaces/IUser";
 // Validation Functions
 //------------------------
 
-const validateEmail = (email: string): boolean => {
+export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
   return emailRegex.test(email);
 };
@@ -19,7 +19,7 @@ const verifyPassword = async (
   return await bcrypt.compare(inputPassword, userPassword);
 };
 
-const checkUserExists = async (email: string) => {
+export const checkUserExists = async (email: string) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new Error("User already exists");
@@ -39,6 +39,10 @@ const generateToken = (userId: string, role: string): string => {
   return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: "1h" });
 };
 
+export const hashPassword = async (password: string): Promise<string> => {
+  return await bcrypt.hash(password, 10);
+};
+
 //------------------------
 // Service Functions
 //------------------------
@@ -55,7 +59,7 @@ export const registerUser = async (
 
   await checkUserExists(email);
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
   const user = await User.create({
     username,
