@@ -77,7 +77,9 @@ export const loginUser = async (
 ): Promise<{ token: string; user: IUser }> => {
   const user = await User.findOne({ email });
   if (!user || !(await verifyPassword(user.password, password))) {
-    throw new Error("Invalid credentials - Email or password is incorrect");
+    const error: any = new Error("Invalid credentials - Email or password is incorrect");
+    error.status = 401; 
+    throw error;
   }
 
   const token = generateToken(user._id.toString(), user.role);

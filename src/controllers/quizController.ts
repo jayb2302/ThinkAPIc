@@ -27,14 +27,14 @@ export const getQuizById: RequestHandler = async (req, res): Promise<void> => {
 };
 
 // Get quizzes by topic
-export const getQuizzesByTopic: RequestHandler = async (req, res): Promise<void> => {
+export const getQuizzesByTopic: RequestHandler = async (req, res, next): Promise<void> => {
   try {
     const { topicId } = req.params;
     const quizzes = await quizService.getQuizzesByTopic(topicId);
     res.status(200).json(quizzes);
   } catch (error) {
     console.error("❌ Error Fetching Quizzes by Topic:", error);
-    res.status(500).json({ error: "Failed to fetch quizzes for this topic" });
+    next(error); 
   }
 };
 
@@ -54,7 +54,6 @@ export const getUserQuizProgress: RequestHandler = async (req, res, next): Promi
   try {
     const { userId, courseId } = req.params;
 
-    // Call the service function
     const progress = await quizService.getUserQuizProgress(userId, courseId);
 
     // Handle case where no progress is found
@@ -66,31 +65,18 @@ export const getUserQuizProgress: RequestHandler = async (req, res, next): Promi
     res.status(200).json(progress);
   } catch (error) {
     console.error("❌ Error Fetching Quiz Progress:", error);
-    next(error); // ✅ Passes error to the global error handler
+    next(error);
   }
 };
 
 // Create a new quiz
 export const createQuiz: RequestHandler = async (
   req: AuthRequest,
-  res
+  res,
+  next
 ): Promise<void> => {
   try {
     console.log("📥 Received Request Body:", req.body);
-
-    // Ensure the user is authenticated
-    if (!req.user) {
-      res.status(401).json({ error: "Unauthorized - Please log in" });
-      return;
-    }
-
-    // Restrict access to admins only
-    if (req.user.role !== "admin") {
-      res
-        .status(403)
-        .json({ error: "Forbidden - Only admins can create quizzes" });
-      return;
-    }
 
     const newQuiz = await quizService.createQuiz(req.body);
 
@@ -99,29 +85,17 @@ export const createQuiz: RequestHandler = async (
     return;
   } catch (error) {
     console.error("❌ Error Creating Quiz:", error);
-    res.status(500).json({ error: "Failed to create quiz" });
-    return;
+    next(error);
   }
 };
 
 // Update a quiz
 export const updateQuiz: RequestHandler = async (
   req: AuthRequest,
-  res
+  res,
+  next
 ): Promise<void> => {
   try {
-    // Check if user is authenticated
-    if (!req.user) {
-      res.status(401).json({ error: "Unauthorized - Please log in" });
-      return;
-    }
-
-    // Check if user is an admin
-    if (req.user.role !== "admin") {
-      res.status(403).json({ error: "Forbidden - Only admins can update quizzes" });
-      return;
-    }
-
     const updatedQuiz = await quizService.updateQuiz(req.params.id, req.body);
     
     console.log("✅ Updated Quiz:", updatedQuiz);
@@ -134,75 +108,50 @@ export const updateQuiz: RequestHandler = async (
     res.status(200).json({ message: "✅ Quiz updated successfully", updatedQuiz });
   } catch (error) {
     console.error("❌ Error Updating Quiz:", error);
-    res.status(500).json({ error: "Failed to update quiz" });
+    next(error);
   }
 };
 // Delete a quiz
 export const deleteQuiz: RequestHandler = async (
   req: AuthRequest,
-  res
+  res,
+  next
 ): Promise<void> => {
   try {
-    // Check if user is authenticated
-    if (!req.user) {
-      res.status(401).json({ error: "Unauthorized - Please log in" });
-      return;
-    }
 
-    // Check if user is an admin
-    if (req.user.role !== "admin") {
-      res.status(403).json({ error: "Forbidden - Only admins can delete quizzes" });
-      return;
-    }
-
-    const deletedQuiz = await quizService.deleteQuiz(req.params.id);
-
-    if (!deletedQuiz) {
-      res.status(404).json({ error: "Quiz not found" });
-      return;
-    }
+    await quizService.deleteQuiz(req.params.id);
 
     console.log("✅ Deleted Quiz:", deleteQuiz);
     res.status(200).json({ message: "✅ Quiz deleted successfully" });
   } catch (error) {
     console.error("❌ Error Deleting Quiz:", error);
-    res.status(500).json({ error: "Failed to delete quiz" });
+    next(error);
   }
 };
 
 // Attempt a quiz
 export const attemptQuiz: RequestHandler = async (
   req: AuthRequest,
-  res
+  res,
+  next
 ): Promise<void> => {
   try {
-    if (!req.user || !req.user._id) {
-      console.error("❌ User not authenticated:", req.user);
-      res.status(401).json({ error: 'Unauthorized - Please log in' });
-      return;
-    }
-    console.log("🔍 Checking req.user:", req.user); // Log the user object
-    
-    const userId = req.user._id;
+
     const quizId = req.params.id;
     const { selectedOptionOrder, courseId } = req.body;
+    const userId = req.user!._id;
 
-    if (!quizId || quizId === "null"){
-      console.error("❌ Quiz ID is missing in request params", quizId);
-      res.status(400).json({ error: "Quiz ID is required" });
-      return;
-    }
     console.log("📌 Quiz Attempt Request:", { userId, quizId, selectedOptionOrder, courseId });
-    const result = await quizService.attemptQuiz(quizId,{ userId: req.user._id, selectedOptionOrder, courseId });
+    const result = await quizService.attemptQuiz(quizId, { userId, selectedOptionOrder, courseId });
 
     res.status(201).json({
       message: '✅ Quiz attempt logged successfully',
       isCorrect: result.isCorrect,
       topicId: result.topicId,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('❌ Error Attempting Quiz:', error);
-    res.status(error.status || 500).json({ error: error.message });
+    next(error);
   }
 };
 
