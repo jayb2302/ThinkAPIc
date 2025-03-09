@@ -18,7 +18,7 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Quizzes
- *   description: Quiz management endpoints
+ *   description: API endpoints for quizzes
  */
 
 // Public Routes
@@ -36,7 +36,7 @@ const router = express.Router();
  *             schema:
  *               type: array
  *               items:
- *                 $ref: "#/components/schemas/Quiz"
+ *                 $ref: "#/components/schemas/QuizResponse"
  */
 router.get("/", getQuizzes);
 /**
@@ -51,6 +51,7 @@ router.get("/", getQuizzes);
  *         required: true
  *         schema:
  *           type: string
+ *           example: "67a1fb6a19841151773d89b1"
  *         description: The ID of the quiz to retrieve
  *     responses:
  *       200:
@@ -58,19 +59,53 @@ router.get("/", getQuizzes);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/Quiz"
+ *               $ref: "#/components/schemas/QuizResponse"
  *       404:
  *         description: Quiz not found
  */
 router.get("/:id", getQuizById);
+
+/**
+ * @swagger
+ * /api/quizzes/topic/{topicId}:
+ *   get:
+ *     summary: Get all quizzes for a specific topic
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: topicId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "679b42460a99919e3b623a76"
+ *         description: The ID of the topic to retrieve quizzes for
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved quizzes for the topic
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: "#/components/schemas/QuizResponse"
+ *       404:
+ *         description: No quizzes found for this topic
+ */
 router.get("/topic/:topicId", getQuizzesByTopic);
 
-// Authenticated Routes
+// Authenticated Routes (User-Only)
 /**
  * @swagger
  * /api/quizzes/{id}/attempt:
  *   post:
  *     summary: Submit a quiz attempt for a user
+ *     description: |
+ *       **How to try this API:**
+ *       1. First, fetch available quizzes using [GET /api/quizzes](#/Quizzes/get_api_quizzes).
+ *       2. Copy a valid `quizId` from the response.
+ *       3. Use that `quizId` in the `id` parameter here.
+ *       4. Provide a valid `userId` and `courseId` in the request body.
+ *       5. Provide the `selectedOptionOrder` (1-based index) for the selected answer.
  *     tags: [Quizzes]
  *     security:
  *       - bearerAuth: []
@@ -80,50 +115,21 @@ router.get("/topic/:topicId", getQuizzesByTopic);
  *         required: true
  *         schema:
  *           type: string
+ *           example: "67a1fb6a19841151773d89b1"  
  *         description: The ID of the quiz being attempted
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 description: The ID of the user who is attempting the quiz
- *                 example: "679ffd9c76e8bc94e67258e4"  # Correct example userId
- *               quizId:
- *                 type: string
- *                 description: The ID of the quiz being attempted
- *                 example: "67c99db4d704ccfd8c43657d"  # Correct example quizId
- *               selectedOptionOrder:
- *                 type: number
- *                 description: The order of the selected answer option
- *                 example: 3  # Correct example selectedOptionOrder
- *               courseId:
- *                 type: string
- *                 description: The ID of the course related to the quiz
- *                 example: "679b42460a99919e3b623a74"  # Correct example courseId
+ *             $ref: "#/components/schemas/QuizAttemptRequest"
  *     responses:
  *       201:
  *         description: Successfully logged the quiz attempt
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Response message
- *                   example: "Quiz attempt logged"
- *                 isCorrect:
- *                   type: boolean
- *                   description: Whether the answer was correct
- *                   example: true
- *                 topicId:
- *                   type: string
- *                   description: The ID of the associated topic
- *                   example: "679b42460a99919e3b623a76"
+ *              $ref: "#/components/schemas/QuizAttemptResponse"
  *       400:
  *         description: Invalid option selected
  *       401:
@@ -149,20 +155,22 @@ router.post("/:id/attempt", authenticateUser, attemptQuiz);
  *         required: true
  *         schema:
  *           type: string
+*            example: 67c4d034e1968c13a337c8c3
  *         description: The ID of the user to get quiz attempts for
  *     responses:
  *       200:
- *         description: Successfully retrieved user quiz attempts
+ *         description: Successfully retrieved all quiz attempts for the user
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: "#/components/schemas/QuizAttempt"
+ *                 $ref: "#/components/schemas/UserQuizAttemptsResponse"
  *       404:
  *         description: No quiz attempts found for this user.
  */
 router.get("/attempts/:userId", authenticateUser, getUserQuizAttempts);
+
 /**
  * @swagger
  * /api/quizzes/progress/{userId}/{courseId}:
@@ -177,12 +185,14 @@ router.get("/attempts/:userId", authenticateUser, getUserQuizAttempts);
  *         required: true
  *         schema:
  *           type: string
+ *           example: 67c4d034e1968c13a337c8c3
  *         description: The ID of the user to get quiz progress for
  *       - in: path
  *         name: courseId
  *         required: true
  *         schema:
  *           type: string
+ *           example: 679b42460a99919e3b623a74
  *         description: The ID of the course to get quiz progress for
  *     responses:
  *       200:
@@ -192,60 +202,7 @@ router.get("/attempts/:userId", authenticateUser, getUserQuizAttempts);
  *             schema:
  *               type: array
  *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     description: The ID of the progress log entry
- *                   user:
- *                     type: string
- *                     description: The ID of the user who made the attempt
- *                   course:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: The ID of the course
- *                       title:
- *                         type: string
- *                         description: The title of the course
- *                   topic:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: The ID of the topic
- *                       title:
- *                         type: string
- *                         description: The title of the topic
- *                   activityType:
- *                     type: string
- *                     enum: [quiz, topic, coding, debugging, cicd]
- *                     description: Type of the activity
- *                   activityTable:
- *                     type: string
- *                     description: The table where the activity is stored (e.g., "quizzes")
- *                   activityId:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: The ID of the quiz
- *                       question:
- *                         type: string
- *                         description: The question associated with the quiz
- *                   completedAt:
- *                     type: string
- *                     format: date-time
- *                     description: The timestamp of when the activity was completed
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: The timestamp of when the entry was created
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     description: The timestamp of the last update to the entry
+ *                 $ref: "#/components/schemas/UserQuizProgressResponse"
  *       404:
  *         description: User or Course not found
  */
@@ -268,16 +225,23 @@ router.get(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Quiz"
+ *             $ref: "#/components/schemas/QuizRequest"
  *     responses:
  *       201:
  *         description: Quiz created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: "#/components/schemas/QuizResponse"
  *       400:
  *         description: Invalid request data
  *       401:
  *         description: Unauthorized access
  */
 router.post("/", authenticateUser, authorizeAdmin, createQuiz);
+
 /**
  * @swagger
  * /api/quizzes/{id}:
@@ -298,10 +262,14 @@ router.post("/", authenticateUser, authorizeAdmin, createQuiz);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/Quiz"
+ *             $ref: "#/components/schemas/QuizRequest"
  *     responses:
  *       200:
  *         description: Quiz updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: "#/components/schemas/QuizResponse"
  *       400:
  *         description: Invalid request data
  *       401:
@@ -324,7 +292,7 @@ router.put("/:id", authenticateUser, authorizeAdmin, updateQuiz);
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the quiz to delete
+ *           description: The ID of the quiz to delete
  *     responses:
  *       200:
  *         description: Quiz deleted successfully
