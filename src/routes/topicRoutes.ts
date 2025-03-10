@@ -19,10 +19,9 @@ const router = express.Router();
 //--------------------------------------------
 //🔓 Public routes
 //--------------------------------------------
-
 /**
  * @swagger
- * /api/topics:
+ * /topics:
  *   get:
  *     summary: Get all topics
  *     tags: [Topics]
@@ -40,7 +39,7 @@ router.get("/", getTopics);
 
 /**
  * @swagger
- * /api/topics/{id}:
+ * /topics/{id}:
  *   get:
  *     summary: Get a single topic by ID
  *     tags: [Topics]
@@ -69,7 +68,7 @@ router.get("/:id", getTopicById);
 //--------------------------------------------
 /**
  * @swagger
- * /api/topics:
+ * /topics:
  *   post:
  *     summary: Create a new topic
  *     tags: [Topics]
@@ -99,7 +98,7 @@ router.post("/", authenticateUser, authorizeAdmin, createTopic);
 
 /**
  * @swagger
- * /api/topics/{id}:
+ * /topics/{id}:
  *   put:
  *     summary: Update an existing topic
  *     tags: [Topics]
@@ -140,7 +139,7 @@ router.put("/:id", authenticateUser, authorizeAdmin, updateTopic);
 
 /**
  * @swagger
- * /api/topics/{id}:
+ * /topics/{id}:
  *   delete:
  *     summary: Delete a topic
  *     tags: [Topics]

@@ -17,7 +17,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/courses:
+ * /courses:
  *   get:
  *     summary: Retrieve all courses
  *     tags: [Courses]
@@ -35,7 +35,7 @@ router.get("/", getCourses);
 
 /**
  * @swagger
- * /api/courses/{id}:
+ * /courses/{id}:
  *   get:
  *     summary: Get a course by ID
  *     tags: [Courses]
@@ -64,7 +64,7 @@ router.get("/:id", getCourseById);
 //--------------------------------------------
 /**
  * @swagger
- * /api/courses:
+ * /courses:
  *   post:
  *     summary: Create a new course
  *     tags: [Courses]
@@ -94,7 +94,7 @@ router.post("/", authenticateUser, authorizeAdmin, createCourse);
 
 /**
  * @swagger
- * /api/courses/{id}:
+ * /courses/{id}:
  *   put:
  *     summary: Update an existing course
  *     tags: [Courses]
@@ -134,7 +134,7 @@ router.put("/:id", authenticateUser, authorizeAdmin, updateCourse);
 
 /**
  * @swagger
- * /api/courses/{id}:
+ * /courses/{id}:
  *   delete:
  *     summary: Delete a course
  *     tags: [Courses]

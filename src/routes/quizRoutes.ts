@@ -26,7 +26,7 @@ const router = express.Router();
 // ------------------------------------------
 /**
  * @swagger
- * /api/quizzes:
+ * /quizzes:
  *   get:
  *     summary: Get all quizzes
  *     tags: [Quizzes]
@@ -43,7 +43,7 @@ const router = express.Router();
 router.get("/", getQuizzes);
 /**
  * @swagger
- * /api/quizzes/{id}:
+ * /quizzes/{id}:
  *   get:
  *     summary: Get a quiz by ID
  *     tags: [Quizzes]
@@ -69,7 +69,7 @@ router.get("/:id", getQuizById);
 
 /**
  * @swagger
- * /api/quizzes/topic/{topicId}:
+ * /quizzes/topic/{topicId}:
  *   get:
  *     summary: Get all quizzes for a specific topic
  *     tags: [Quizzes]
@@ -100,12 +100,12 @@ router.get("/topic/:topicId", getQuizzesByTopic);
 //--------------------------------------------
 /**
  * @swagger
- * /api/quizzes/{id}/attempt:
+ * /quizzes/{id}/attempt:
  *   post:
  *     summary: Submit a quiz attempt for a user
  *     description: |
  *       **How to try this API:**
- *       1. First, fetch available quizzes using [GET /api/quizzes](#/Quizzes/get_api_quizzes).
+ *       1. First, fetch available quizzes using [GET /quizzes](#/Quizzes/get_api_quizzes).
  *       2. Copy a valid `quizId` from the response.
  *       3. Use that `quizId` in the `id` parameter here.
  *       4. Provide a valid `courseId` in the request body.
@@ -147,7 +147,7 @@ router.post("/:id/attempt", authenticateUser, attemptQuiz);
 
 /**
  * @swagger
- * /api/quizzes/attempts/{userId}:
+ * /quizzes/attempts/{userId}:
  *   get:
  *     summary: Get quiz attempts by user ID
  *     tags: [Quizzes]
@@ -177,7 +177,7 @@ router.get("/attempts/:userId", authenticateUser, getUserQuizAttempts);
 
 /**
  * @swagger
- * /api/quizzes/progress/{userId}/{courseId}:
+ * /quizzes/progress/{userId}/{courseId}:
  *   get:
  *     summary: Get quiz progress by user and course IDs
  *     tags: [Quizzes]
@@ -217,7 +217,7 @@ router.get("/progress/:userId/:courseId", authenticateUser, getUserQuizProgress 
 //--------------------------------------------
 /**
  * @swagger
- * /api/quizzes:
+ * /quizzes:
  *   post:
  *     summary: Create a new quiz
  *     tags: [Quizzes]
@@ -247,7 +247,7 @@ router.post("/", authenticateUser, authorizeAdmin, createQuiz);
 
 /**
  * @swagger
- * /api/quizzes/{id}:
+ * /quizzes/{id}:
  *   put:
  *     summary: Update a quiz by ID
  *     tags: [Quizzes]
@@ -284,7 +284,7 @@ router.put("/:id", authenticateUser, authorizeAdmin, updateQuiz);
 
 /**
  * @swagger
- * /api/quizzes/{id}:
+ * /quizzes/{id}:
  *   delete:
  *     summary: Delete a quiz by ID
  *     tags: [Quizzes]

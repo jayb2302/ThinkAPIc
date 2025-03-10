@@ -16,7 +16,7 @@ const router = express.Router();
 // ------------------------------------------
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   get:
  *     summary: Get all users
  *     tags: [Users]
@@ -40,7 +40,7 @@ router.get("/", authenticateUser, authorizeAdmin, getUsers);
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   get:
  *     summary: Get a user by ID
  *     tags: [Users]
@@ -72,7 +72,7 @@ router.get("/:id", authenticateUser, authorizeAdmin, getUserById);
 
 /**
  * @swagger
- * /api/users:
+ * /users:
  *   post:
  *     summary: Create a new user (Admin only)
  *     tags: [Users]
@@ -102,7 +102,7 @@ router.post("/", authenticateUser, authorizeAdmin, createUser);
 
 /**
  * @swagger
- * /api/users/{id}/role:
+ * /users/{id}/role:
  *   put:
  *     summary: Update user role (Admin only)
  *     tags: [Users]
@@ -173,7 +173,7 @@ router.put("/:id/role", authenticateUser, authorizeAdmin, updateUserRole);
 
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   delete:
  *     summary: Delete a user (Admin only)
  *     tags: [Users]
@@ -203,7 +203,7 @@ router.delete("/:id", authenticateUser, authorizeAdmin, deleteUser);
 // ------------------------------------------
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   put:
  *     summary: Update user profile
  *     tags: [Users]

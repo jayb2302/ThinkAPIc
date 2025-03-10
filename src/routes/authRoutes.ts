@@ -11,7 +11,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/auth:
+ * /auth:
  *   get:
  *     summary: Check if auth routes are working
  *     tags: [Authentication]
@@ -25,7 +25,7 @@ router.get("/", (req, res) => {
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Register a new user
  *     tags: [Authentication]
@@ -52,7 +52,7 @@ router.get("/", (req, res) => {
 router.post("/register", register);
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Log in a user
  *     tags: [Authentication]

@@ -12,7 +12,7 @@ export function setupDocs(app: Application) {
         "REST API documentation for ThinkAPIc. - Login to access the API",
     },
     servers: [
-      { url: "http://localhost:4000/", description: "Local API" },
+      { url: "http://localhost:4000/api", description: "Local API" },
       { url: 'https://thinkapic.onrender.com/api', description: 'Production API' },
     ],
     components: {
