@@ -506,5 +506,42 @@ export function setupDocs(app: Application) {
   };
 
   const swaggerSpec = swaggerJsdoc(options);
-  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    "/api/docs", 
+    swaggerUi.serve, 
+    swaggerUi.setup(swaggerSpec,{
+      customSiteTitle: "ThinkAPIc Documentation",
+      customCss: `
+      .swagger-ui .topbar {
+        background-color:rgb(190, 191, 193);
+        padding: 10px 20px;
+        display: flex;
+      }
+    
+      .swagger-ui .topbar .wrapper {
+        display: none !important;
+        align-items: center;
+      }
+      
+      .swagger-ui .topbar::before {
+        content: "";
+        display: inline-block;
+        background: url('/ExplodingHead.svg') no-repeat center;
+        background-size: contain;
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+
+      /* Replace the Swagger text */
+      .swagger-ui .topbar::after {
+        content: "ThinkAPIc";
+        font-size: 30px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        color: black;
+      }
+    `,
+      customfavIcon: "/ExplodingHead.svg",
+    }));
 }
