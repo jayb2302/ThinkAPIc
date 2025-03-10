@@ -13,7 +13,10 @@ export function setupDocs(app: Application) {
     },
     servers: [
       { url: "http://localhost:4000/api", description: "Local API" },
-      { url: 'https://thinkapic.onrender.com/api', description: 'Production API' },
+      {
+        url: "https://thinkapic.onrender.com/api",
+        description: "Production API",
+      },
     ],
     components: {
       securitySchemes: {
@@ -46,7 +49,7 @@ export function setupDocs(app: Application) {
         },
         UserResponse: {
           allOf: [
-            { $ref: "#/components/schemas/UserRequest" }, 
+            { $ref: "#/components/schemas/UserRequest" },
             {
               type: "object",
               properties: {
@@ -74,24 +77,27 @@ export function setupDocs(app: Application) {
           required: ["title", "description", "teacher", "scope", "semester"],
           properties: {
             title: { type: "string", example: "Web Development" },
-            description: { type: "string", example: "Learn full-stack web development" },
+            description: {
+              type: "string",
+              example: "Learn full-stack web development",
+            },
             teacher: { type: "string", example: "Dr. Jane Doe" },
             scope: { type: "string", example: "Full-time" },
             semester: { type: "string", example: "Fall 2024" },
-            learningObjectives: { 
-              type: "array", 
-              items: { type: "string" }, 
-              example: ["Understand full-stack development", "Learn APIs"] 
+            learningObjectives: {
+              type: "array",
+              items: { type: "string" },
+              example: ["Understand full-stack development", "Learn APIs"],
             },
-            skills: { 
-              type: "array", 
-              items: { type: "string" }, 
-              example: ["JavaScript", "TypeScript", "Node.js"] 
+            skills: {
+              type: "array",
+              items: { type: "string" },
+              example: ["JavaScript", "TypeScript", "Node.js"],
             },
-            competencies: { 
-              type: "array", 
-              items: { type: "string" }, 
-              example: ["REST API design", "Database management"] 
+            competencies: {
+              type: "array",
+              items: { type: "string" },
+              example: ["REST API design", "Database management"],
             },
             topics: {
               type: "array",
@@ -103,15 +109,19 @@ export function setupDocs(app: Application) {
         },
         CourseResponse: {
           allOf: [
-            { $ref: "#/components/schemas/CourseRequest" }, 
+            { $ref: "#/components/schemas/CourseRequest" },
             {
               type: "object",
               properties: {
-                _id: { type: "string", description: "Course ID", example: "679b42460a99919e3b623a74" },
-                topics: { 
+                _id: {
+                  type: "string",
+                  description: "Course ID",
+                  example: "679b42460a99919e3b623a74",
+                },
+                topics: {
                   type: "array",
                   description: "Detailed topic information",
-                  items: { $ref: "#/components/schemas/TopicResponse" }, 
+                  items: { $ref: "#/components/schemas/TopicResponse" },
                 },
               },
             },
@@ -149,11 +159,15 @@ export function setupDocs(app: Application) {
         },
         TopicResponse: {
           allOf: [
-            { $ref: "#/components/schemas/TopicRequest" }, 
+            { $ref: "#/components/schemas/TopicRequest" },
             {
               type: "object",
               properties: {
-                _id: { type: "string", description: "Topic ID", example: "679b42460a99919e3b623a76" },
+                _id: {
+                  type: "string",
+                  description: "Topic ID",
+                  example: "679b42460a99919e3b623a76",
+                },
                 course: { $ref: "#/components/schemas/CourseResponse" },
               },
             },
@@ -163,8 +177,16 @@ export function setupDocs(app: Application) {
           type: "object",
           required: ["topic", "question", "options"],
           properties: {
-            topic: { type: "string", description: "Topic ID", example: "679b42460a99919e3b623a76" },
-            question: { type: "string", description: "The quiz question", example: "What is the question?" },
+            topic: {
+              type: "string",
+              description: "Topic ID",
+              example: "679b42460a99919e3b623a76",
+            },
+            question: {
+              type: "string",
+              description: "The quiz question",
+              example: "What is the question?",
+            },
             options: {
               type: "array",
               description: "List of answer options",
@@ -185,15 +207,30 @@ export function setupDocs(app: Application) {
             {
               type: "object",
               properties: {
-                _id: { type: "string", description: "Quiz ID", example: "67a9250ec86b3d5afdafa87e" },
-                createdAt: { type: "string", format: "date-time", example: "2025-02-04T11:35:06.685Z" },
-                updatedAt: { type: "string", format: "date-time", example: "2025-02-27T09:44:31.060Z" },
+                _id: {
+                  type: "string",
+                  description: "Quiz ID",
+                  example: "67a9250ec86b3d5afdafa87e",
+                },
+                createdAt: {
+                  type: "string",
+                  format: "date-time",
+                  example: "2025-02-04T11:35:06.685Z",
+                },
+                updatedAt: {
+                  type: "string",
+                  format: "date-time",
+                  example: "2025-02-27T09:44:31.060Z",
+                },
                 options: {
                   type: "array",
                   items: {
                     type: "object",
                     properties: {
-                      text: { type: "string", example: "An architecture style" },
+                      text: {
+                        type: "string",
+                        example: "An architecture style",
+                      },
                       isCorrect: { type: "boolean", example: true },
                       order: { type: "integer" },
                     },
@@ -386,7 +423,8 @@ export function setupDocs(app: Application) {
             },
             activityTable: {
               type: "string",
-              description: "The table in the database where the activity is recorded",
+              description:
+                "The table in the database where the activity is recorded",
               example: "quizzes",
             },
             activityId: {
@@ -409,7 +447,8 @@ export function setupDocs(app: Application) {
             updatedAt: {
               type: "string",
               format: "date-time",
-              description: "Timestamp when the quiz attempt record was last updated",
+              description:
+                "Timestamp when the quiz attempt record was last updated",
               example: "2025-03-07T13:48:30.914Z",
             },
           },
@@ -467,13 +506,15 @@ export function setupDocs(app: Application) {
             },
             activityTable: {
               type: "string",
-              description: "The table in the database where the activity is recorded",
+              description:
+                "The table in the database where the activity is recorded",
               example: "quizzes",
             },
             activityId: {
               type: "string",
-              nullable: true, 
-              description: "ID of the quiz that was attempted (null if no specific quiz is linked)",
+              nullable: true,
+              description:
+                "ID of the quiz that was attempted (null if no specific quiz is linked)",
               example: null,
             },
             completedAt: {
@@ -491,7 +532,8 @@ export function setupDocs(app: Application) {
             updatedAt: {
               type: "string",
               format: "date-time",
-              description: "Timestamp when the progress record was last updated",
+              description:
+                "Timestamp when the progress record was last updated",
               example: "2025-03-07T13:48:30.914Z",
             },
           },
@@ -507,41 +549,118 @@ export function setupDocs(app: Application) {
 
   const swaggerSpec = swaggerJsdoc(options);
   app.use(
-    "/api/docs", 
-    swaggerUi.serve, 
-    swaggerUi.setup(swaggerSpec,{
+    "/api/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
       customSiteTitle: "ThinkAPIc Documentation",
       customCss: `
-      .swagger-ui .topbar {
-        background-color:rgb(190, 191, 193);
-        padding: 10px 20px;
-        display: flex;
+      .swagger-ui {
+        font-family: 'Montserrat', sans-serif !important;
+        .btn.authorize {
+          border-color:rgb(22, 116, 6) !important;
+          color:rgb(22, 116, 6) !important;
+          & svg {
+            fill:rgb(22, 116, 6) !important;
+          }
+        }
+        .btn.cancel {
+          border-color:rgb(120, 38, 38) !important;
+          color:rgb(123, 29, 29) !important;
+        }
       }
-    
-      .swagger-ui .topbar .wrapper {
-        display: none !important;
-        align-items: center;
-      }
-      
-      .swagger-ui .topbar::before {
-        content: "";
-        display: inline-block;
-        background: url('/ExplodingHead.svg') no-repeat center;
-        background-size: contain;
-        width: 40px;
-        height: 40px;
-        margin-right: 10px;
+     
+      .swagger-ui .opblock {
+        &.opblock-post {
+          background-color: rgba(130, 163, 138, 0.30) !important;
+          border: 1px solid rgb(130, 163, 138) !important;
+          .opblock-summary-method {
+            background-color: rgb(130, 163, 138) !important;
+          }
+          .tab-header .tab-item.active h4 span:after {
+            background-color: rgb(82, 143, 98) !important;
+          }
+        }
+
+        &.opblock-get {
+          background-color: rgba(126, 144, 163, 0.30) !important;
+          border: 1px solid rgb(126, 144, 163) !important;
+          .opblock-summary-method {
+            background-color: rgb(126, 144, 163) !important;
+          }
+          .tab-header .tab-item.active h4 span:after {
+            background-color: rgb(82, 116, 143) !important;
+          }
+        }
+
+        &.opblock-put {
+          background-color: rgba(188, 160, 137, 0.30) !important;
+          border: 1px solid rgb(188, 160, 137) !important;
+          
+          .opblock-summary-method {
+            background-color: rgb(188, 160, 137) !important;
+          }
+          .tab-header .tab-item.active h4 span:after {
+            background-color: rgb(176, 101, 39) !important;
+          }
+        }
+
+        &.opblock-delete {
+          background-color: rgba(176, 144, 148, 0.30) !important;
+          border: 1px solid rgb(176, 144, 148) !important;
+          
+          .opblock-summary-method {
+            background-color: rgb(176, 144, 148) !important;
+          }
+          .tab-header .tab-item.active h4 span:after {
+            background-color: rgb(159, 87, 103) !important;
+          }
+        }
+
+        &.opblock-head {
+          background-color: rgba(175, 162, 198, 0.30) !important;
+        }
+
+        &.opblock-options {
+          background-color:rgb(22, 74, 130) !important;
+        }
       }
 
-      /* Replace the Swagger text */
-      .swagger-ui .topbar::after {
-        content: "ThinkAPIc";
-        font-size: 30px;
-        font-family: 'Montserrat', sans-serif;
-        font-weight: bold;
-        color: black;
+      .swagger-ui .opblock.is-open .opblock-summary {
+        border: none !important;
+      }
+        
+      .swagger-ui .btn.execute {
+        background-color:rgb(50, 110, 140) !important;
+        border-color:rgb(11, 94, 135) !important;
+      }
+      
+      .swagger-ui .topbar {
+        background-color:rgb(216, 217, 219);
+        padding: 10px 20px;
+        display: flex;
+        .wrapper {
+          display: none !important;
+          align-items: center;
+        }
+        &::before {
+          content: "";
+          display: inline-block;
+          background: url('/ExplodingHead.svg') no-repeat center;
+          background-size: contain;
+          width: 40px;
+          height: 40px;
+          margin-right: 10px;
+        }
+        &::after {
+          content: "ThinkAPIc";
+          font-size: 30px;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: bold;
+          color: black;
+        }
       }
     `,
       customfavIcon: "/ExplodingHead.svg",
-    }));
+    })
+  );
 }
