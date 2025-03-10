@@ -3,30 +3,24 @@ import { IUser } from "../interfaces/IUser";
 import User from "../models/User";
 import { validateEmail, checkUserExists, hashPassword } from "./authService";
 
-//------------------------
+//----------------------------------------------------------------
 // Validation Functions
-//------------------------
-
-// Check if the provided role is valid
+//----------------------------------------------------------------
 const isValidRole = (role: string): boolean => {
   return ["student", "admin"].includes(role);
 };
 
-//------------------------
-// Service Functions
-//------------------------
-
-// Get all users
+//----------------------------------------------------------------
+// User Service Functions
+//----------------------------------------------------------------
 export const getAllUsers = async (): Promise<IUser[]> => {
-  return await User.find();
+  return await User.find().select("-password").exec();
 };
 
-// Get user by ID
 export const getUserById = async (id: string): Promise<IUser | null> => {
   return await User.findById(id);
 };
 
-// Update User role
 export const updateUserRole = async (
   userId: string,
   newRole: "student" | "admin"
@@ -49,7 +43,6 @@ export const updateUserRole = async (
   return user;
 };
 
-// Update a user's profile (admin or self)
 export const updateUserProfile = async (
   id: string,
   updateData: Partial<IUser>
@@ -57,7 +50,6 @@ export const updateUserProfile = async (
   return await User.findByIdAndUpdate(id, updateData, { new: true });
 };
 
-// Create a new user (admin only)
 export const createUser = async (
   username: string,
   email: string,
@@ -82,7 +74,6 @@ export const createUser = async (
   return user;
 };
 
-// Delete a user (admin only)
 export const deleteUser = async (id: string): Promise<IUser | null> => {
   return await User.findByIdAndDelete(id);
 };

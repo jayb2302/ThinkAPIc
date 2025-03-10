@@ -5,10 +5,9 @@ import Course from "../models/Course";
 import ProgressLog from "../models/ProgressLog";
 import { ActivityType, IProgressLog } from "../interfaces/IProgressLog";
 
-// ==========================
+// ---------------------------------------------------------------
 // Helper Functions
-// ==========================
-
+// ---------------------------------------------------------------
 const validateQuizFields = ({ topic, question, options }: IQuiz) => {
   if (
     !topic ||
@@ -39,31 +38,15 @@ const validateTopicCourse = async (topicId: string, courseId: string) => {
   }
 };
 
-// const validateQuizData = async (quizData: IQuiz) => {
-//   validateQuizFields(quizData);
-//   await checkTopicExists(quizData.topic.toString());
-//   checkHasCorrectOption(quizData.options);
-// };
-
-// const validateQuizUpdate = (quizData: Partial<IQuiz>) => {
-//   if (!quizData.topic || !quizData.question || !quizData.options) {
-//     throw new Error(
-//       "Topic, question, and options are required to update a quiz."
-//     );
-//   }
-// };
-
 const validateQuiz = async (quizData: Partial<IQuiz>, isUpdate = false) => {
-  // If it's an update, allow partial fields but ensure at least one field is provided
   if (isUpdate) {
     if (!quizData.topic && !quizData.question && !quizData.options) {
       throw new Error("At least one field (topic, question, or options) must be provided to update a quiz.");
     }
     if (quizData.options) {
-      validateQuizFields(quizData as IQuiz); // Ensures at least two options
+      validateQuizFields(quizData as IQuiz); 
     }
   } else {
-    // If it's a creation, all fields are required
     validateQuizFields(quizData as IQuiz);
     await checkTopicExists(quizData.topic!.toString());
     checkHasCorrectOption(quizData.options!);
@@ -118,9 +101,9 @@ const formatOptions = (options: IQuiz["options"]) => {
   }));
 };
 
-// ==========================
+// ---------------------------------------------------------------
 // Quiz Service Functions
-// ==========================
+// ---------------------------------------------------------------
 const getQuizWithTopic = async (
   quizId: string
 ): Promise<{ quiz: IQuiz; topicId: string }> => {
@@ -135,7 +118,7 @@ const getQuizWithTopic = async (
 };
 
 export const getAllQuizzes = async (): Promise<IQuiz[]> => {
-  const quizzes = await Quiz.find().populate("topic");
+  const quizzes = await Quiz.find().populate('_id');
   quizzes.forEach((quiz) => quiz.options.sort((a, b) => a.order - b.order));
   return quizzes;
 };
@@ -147,7 +130,6 @@ export const getQuizById = async (id: string): Promise<IQuiz | null> => {
   return quiz;
 };
 
-// Get all quizzes for a specific topic
 export const getQuizzesByTopic = async (topicId: string): Promise<IQuiz[]> => {
   await checkTopicExists(topicId);
 
@@ -161,7 +143,6 @@ export const getQuizzesByTopic = async (topicId: string): Promise<IQuiz[]> => {
   return quizzes;
 };
 
-// Get User's Quiz Attempts
 export const getUserQuizAttempts = async (
   userId: string
 ): Promise<IProgressLog[]> => {
@@ -185,7 +166,6 @@ export const getUserQuizAttempts = async (
   }
 };
 
-// Get User's Quiz Progress
 export const getUserQuizProgress = async (
   userId: string,
   courseId: string
@@ -269,7 +249,6 @@ export const updateQuiz = async (
   quizId: string,
   quizData: Partial<IQuiz>
 ): Promise<IQuiz | null> => {
-  // Validate quiz update data
   await validateQuiz(quizData, true);
 
   const formattedOptions = formatOptions(quizData.options!);

@@ -1,7 +1,10 @@
 import { RequestHandler } from "express";
 import * as topicService from "../services/topicService";
+import { startSession } from "mongoose";
 
-// get all topics
+//-------------------------------------------------------
+// Topic Controller Functions
+//-------------------------------------------------------
 export const getTopics: RequestHandler = async (req, res): Promise<void> => {
   try {
     const topics = await topicService.getAllTopics();
@@ -11,7 +14,6 @@ export const getTopics: RequestHandler = async (req, res): Promise<void> => {
   }
 };
 
-// Get a single topic by ID
 export const getTopicById: RequestHandler = async (req, res): Promise<void> => {
   try {
     const topic = await topicService.getTopicById(req.params.id);
@@ -25,23 +27,25 @@ export const getTopicById: RequestHandler = async (req, res): Promise<void> => {
   }
 };
 
-// Create a new topic
-export const createTopic: RequestHandler = async (
-  req,
-  res,
-  next
-): Promise<void> => {
+export const createTopic: RequestHandler = async (req, res, next): Promise<void> => {
+  const session = await startSession(); 
+  session.startTransaction();
+
   try {
-    console.log("Request body:", req.body);
-    const newTopic = await topicService.createTopic(req.body);
-    res.status(201).json(newTopic);
+    const newTopic = await topicService.createTopic(req.body, session);
+
+    // Commit the transaction
+    await session.commitTransaction();
+
+    res.status(201).json(newTopic); 
   } catch (error) {
-    console.log("Error creating topic:", error);
-    next(error);
+    await session.abortTransaction();
+    next(error); 
+  } finally {
+    session.endSession();
   }
 };
 
-// Update an existing topic
 export const updateTopic: RequestHandler = async (
   req,
   res,
@@ -58,7 +62,6 @@ export const updateTopic: RequestHandler = async (
   }
 };
 
-// Delete a topic
 export const deleteTopic: RequestHandler = async (
   req,
   res,
