@@ -34,14 +34,35 @@ router.get("/", (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: "#/components/schemas/User"
+ *             type: object
+ *             required: [username, email, password]
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username of the new user
+ *                 example: "MisterFunny"
+ *               email:
+ *                 type: string
+ *                 description: The email of the new user
+ *                 example: "mrfunny@gmail.com"
+ *               password:
+ *                 type: string
+ *                 description: The password for the new user
+ *                 example: "password"
  *     responses:
  *       201:
  *         description: User registered successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: "#/components/schemas/User"
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User registered successfully"
+ *                 user:
+ *                   type: object
+ *                   example: { "_id": "string", "username": "username", "email": "email", "role": "student" }
  *       400:
  *         description: Validation error (invalid input)
  *       409:

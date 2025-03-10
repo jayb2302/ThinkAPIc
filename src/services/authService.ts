@@ -68,8 +68,8 @@ export const registerUser = async (
     password: hashedPassword,
     role,
   });
-
-  return user;
+  const userResponse = await User.findById(user._id).select("-createdAt -updatedAt -__v");
+  return userResponse as IUser;
 };
 
 export const loginUser = async (
