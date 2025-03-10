@@ -12,7 +12,7 @@ export function setupDocs(app: Application) {
         "REST API documentation for ThinkAPIc. - Login to access the API",
     },
     servers: [
-      { url: "http://localhost:4000/", description: "Local API" },
+      { url: "http://localhost:4000/api", description: "Local API" },
       { url: 'https://thinkapic.onrender.com/api', description: 'Production API' },
     ],
     components: {
@@ -24,15 +24,46 @@ export function setupDocs(app: Application) {
         },
       },
       schemas: {
-        User: {
+        // User: {
+        //   type: "object",
+        //   required: ["username", "email", "password"],
+        //   properties: {
+        //     id: {
+        //       type: "string",
+        //       description: "User ID",
+        //       example: "67a1fb6a19841151773d89b1",
+        //     },
+        //     username: { type: "string", example: "jaybeaver" },
+        //     email: { type: "string", example: "jonina@example.com" },
+        //     password: {
+        //       type: "string",
+        //       description: "User's password (not included in responses)",
+        //       example: "securepassword",
+        //       writeOnly: true,
+        //     },
+        //     role: {
+        //       type: "string",
+        //       enum: ["student", "admin"],
+        //       description:
+        //         "User role (student has limited access, admin can manage users)",
+        //       example: "student",
+        //     },
+        //     createdAt: {
+        //       type: "string",
+        //       format: "date-time",
+        //       example: "2025-02-04T11:35:06.685Z",
+        //     },
+        //     updatedAt: {
+        //       type: "string",
+        //       format: "date-time",
+        //       example: "2025-02-27T09:44:31.060Z",
+        //     },
+        //   },
+        // },
+        UserRequest: {
           type: "object",
           required: ["username", "email", "password"],
           properties: {
-            id: {
-              type: "string",
-              description: "User ID",
-              example: "67a1fb6a19841151773d89b1",
-            },
             username: { type: "string", example: "jaybeaver" },
             email: { type: "string", example: "jonina@example.com" },
             password: {
@@ -44,21 +75,35 @@ export function setupDocs(app: Application) {
             role: {
               type: "string",
               enum: ["student", "admin"],
-              description:
-                "User role (student has limited access, admin can manage users)",
+              description: "User role (default: student)",
               example: "student",
             },
-            createdAt: {
-              type: "string",
-              format: "date-time",
-              example: "2025-02-04T11:35:06.685Z",
-            },
-            updatedAt: {
-              type: "string",
-              format: "date-time",
-              example: "2025-02-27T09:44:31.060Z",
-            },
           },
+        },
+        UserResponse: {
+          allOf: [
+            { $ref: "#/components/schemas/UserRequest" }, 
+            {
+              type: "object",
+              properties: {
+                _id: {
+                  type: "string",
+                  description: "User ID",
+                  example: "67a1fb6a19841151773d89b1",
+                },
+                createdAt: {
+                  type: "string",
+                  format: "date-time",
+                  example: "2025-02-04T11:35:06.685Z",
+                },
+                updatedAt: {
+                  type: "string",
+                  format: "date-time",
+                  example: "2025-02-27T09:44:31.060Z",
+                },
+              },
+            },
+          ],
         },
         // Course: {
         //   type: "object",
@@ -403,11 +448,6 @@ export function setupDocs(app: Application) {
           type: "object",
           required: ["userId", "selectedOptionOrder", "courseId"],
           properties: {
-            userId: {
-              type: "string",
-              description: "The ID of the user attempting the quiz",
-              example: "679ffd9c76e8bc94e67258e4",
-            },
             selectedOptionOrder: {
               type: "integer",
               description:
