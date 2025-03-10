@@ -24,42 +24,6 @@ export function setupDocs(app: Application) {
         },
       },
       schemas: {
-        // User: {
-        //   type: "object",
-        //   required: ["username", "email", "password"],
-        //   properties: {
-        //     id: {
-        //       type: "string",
-        //       description: "User ID",
-        //       example: "67a1fb6a19841151773d89b1",
-        //     },
-        //     username: { type: "string", example: "jaybeaver" },
-        //     email: { type: "string", example: "jonina@example.com" },
-        //     password: {
-        //       type: "string",
-        //       description: "User's password (not included in responses)",
-        //       example: "securepassword",
-        //       writeOnly: true,
-        //     },
-        //     role: {
-        //       type: "string",
-        //       enum: ["student", "admin"],
-        //       description:
-        //         "User role (student has limited access, admin can manage users)",
-        //       example: "student",
-        //     },
-        //     createdAt: {
-        //       type: "string",
-        //       format: "date-time",
-        //       example: "2025-02-04T11:35:06.685Z",
-        //     },
-        //     updatedAt: {
-        //       type: "string",
-        //       format: "date-time",
-        //       example: "2025-02-27T09:44:31.060Z",
-        //     },
-        //   },
-        // },
         UserRequest: {
           type: "object",
           required: ["username", "email", "password"],
@@ -105,29 +69,6 @@ export function setupDocs(app: Application) {
             },
           ],
         },
-        // Course: {
-        //   type: "object",
-        //   required: ["title", "description", "teacher", "scope", "semester"],
-        //   properties: {
-        //     id: { type: "string", description: "Course ID" },
-        //     title: { type: "string", example: "Web Development" },
-        //     description: {
-        //       type: "string",
-        //       example: "Learn full-stack web development",
-        //     },
-        //     teacher: { type: "string", example: "Dr. Jane Doe" },
-        //     scope: { type: "string", example: "Full-time" },
-        //     semester: { type: "string", example: "Fall 2024" },
-        //     learningObjectives: { type: "array", items: { type: "string" } },
-        //     skills: { type: "array", items: { type: "string" } },
-        //     competencies: { type: "array", items: { type: "string" } },
-        //     topics: {
-        //       type: "array",
-        //       items: { type: "string" },
-        //       description: "IDs of related topics",
-        //     },
-        //   },
-        // },
         CourseRequest: {
           type: "object",
           required: ["title", "description", "teacher", "scope", "semester"],
@@ -176,47 +117,6 @@ export function setupDocs(app: Application) {
             },
           ],
         },
-        // Topic: {
-        //   type: "object",
-        //   required: ["title", "week", "summary", "key_points"],
-        //   properties: {
-        //     id: { type: "string", description: "Topic ID" },
-        //     title: { type: "string", example: "Topic Title" },
-        //     week: { type: "integer", example: 1 },
-        //     summary: {
-        //       type: "string",
-        //       example: "Short summary of the topic",
-        //     },
-        //     key_points: { 
-        //       type: "array", 
-        //       items: { type: "string" },
-        //       example: [
-        //         "What is an API?",
-        //         "What is REST and why is it important?",
-        //         "The Six REST Constraints",
-        //         "Exploring Public REST APIs",
-        //       ],
-        //       },
-        //     resources: {
-        //       type: "array",
-        //       items: {
-        //         type: "object",
-        //         properties: {
-        //           title: { type: "string", example: "Title of Recourse" },
-        //           link: {
-        //             type: "string",
-        //             example: "https://example-resource.com",
-        //           },
-        //         },
-        //       },
-        //     },
-        //     course: {
-        //       type: "string",
-        //       description: "Course ID this topic belongs to",
-        //       example: "679b42460a99919e3b623a74"
-        //     },
-        //   },
-        // },
         TopicRequest: {
           type: "object",
           required: ["title", "week", "summary", "key_points", "course"],
@@ -259,48 +159,12 @@ export function setupDocs(app: Application) {
             },
           ],
         },
-        // Quiz: {
-        //   type: "object",
-        //   required: ["topic", "question", "options"],
-        //   properties: {
-        //     id: {
-        //       type: "string",
-        //       description: "Quiz ID",
-        //       example: "67a9250ec86b3d5afdafa87e",
-        //     },
-        //     topic: { type: "string", description: "Topic ID" },
-        //     question: { type: "string", example: "What is REST?" },
-        //     options: {
-        //       type: "array",
-        //       description: "List of answer options",
-        //       minItems: 2,
-        //       items: {
-        //         type: "object",
-        //         properties: {
-        //           text: { type: "string", example: "An architecture style" },
-        //           isCorrect: { type: "boolean", example: true },
-        //           order: { type: "integer", example: 1 },
-        //         },
-        //       },
-        //     },
-        //     createdAt: {
-        //       type: "string",
-        //       format: "date-time",
-        //       example: "2025-02-04T11:35:06.685Z",
-        //     },
-        //     updatedAt: {
-        //       type: "string",
-        //       format: "date-time",
-        //       example: "2025-02-27T09:44:31.060Z",
-        //     },
-        //   },
-        // },
         QuizRequest: {
           type: "object",
           required: ["topic", "question", "options"],
           properties: {
             topic: { type: "string", description: "Topic ID", example: "679b42460a99919e3b623a76" },
-            question: { type: "string", description: "The quiz question", example: "What is REST?" },
+            question: { type: "string", description: "The quiz question", example: "What is the question?" },
             options: {
               type: "array",
               description: "List of answer options",
@@ -308,14 +172,13 @@ export function setupDocs(app: Application) {
               items: {
                 type: "object",
                 properties: {
-                  text: { type: "string", example: "An architecture style" },
+                  text: { type: "string", example: "What is the Answer" },
                   isCorrect: { type: "boolean", example: true },
                 },
               },
             },
           },
         },
-        
         QuizResponse: {
           allOf: [
             { $ref: "#/components/schemas/QuizRequest" },
@@ -332,7 +195,7 @@ export function setupDocs(app: Application) {
                     properties: {
                       text: { type: "string", example: "An architecture style" },
                       isCorrect: { type: "boolean", example: true },
-                      order: { type: "integer", example: 1 }, 
+                      order: { type: "integer" },
                     },
                   },
                 },
@@ -362,7 +225,7 @@ export function setupDocs(app: Application) {
           },
         },
 
-        // 🔵 Other Schemas (Requests, Responses, etc.)
+        // 🔵 Other Schemas
         LoginRequest: {
           type: "object",
           required: ["email", "password"],
