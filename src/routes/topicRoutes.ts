@@ -16,7 +16,10 @@ const router = express.Router();
  *  description: API endpoints for topics
  */
 
-// Public routes
+//--------------------------------------------
+//🔓 Public routes
+//--------------------------------------------
+
 /**
  * @swagger
  * /api/topics:
@@ -61,7 +64,9 @@ router.get("/", getTopics);
  */
 router.get("/:id", getTopicById);
 
-// Admin Routes
+//--------------------------------------------
+// 🔐 Admin Routes
+//--------------------------------------------
 /**
  * @swagger
  * /api/topics:
