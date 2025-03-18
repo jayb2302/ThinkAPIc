@@ -3,6 +3,7 @@ import { Document, Types } from "mongoose";
 export enum ActivityType {
     TOPIC = "topic",
     QUIZ = "quiz",
+    EXERCISE = "exercise",
     CODING = "coding",
     DEBUGGING = "debugging",
     CICD = "cicd",
@@ -11,6 +12,7 @@ export enum ActivityType {
 export enum ActivityTable {
     TOPICS = "topics",
     QUIZZES = "quizzes",
+    EXERCISES = "exercises",
     CODING_CHALLENGES = "coding_challenges",
     DEBUGGING_TASKS = "debugging_tasks",
     CICD_EXERCISES = "cicd_exercises",
