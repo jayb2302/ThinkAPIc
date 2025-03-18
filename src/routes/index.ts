@@ -5,6 +5,7 @@ import userRoutes from "./userRoutes";
 import authRoutes from "./authRoutes";
 import progressLogRoutes from "./progressLogRoutes";
 import quizRoutes from "./quizRoutes";
+import exerciseRoutes from "./exerciseRoutes";
 
 const router: Router = Router();
 
@@ -13,6 +14,7 @@ router.get("/", (req: Request, res: Response) => {
     res.status(200).send("Welcome to the ThinkAPIc");
 });
 
+
 // Other routes
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
@@ -20,5 +22,7 @@ router.use("/courses", courseRoutes);
 router.use("/topics", topicRoutes);
 router.use("/progress", progressLogRoutes);
 router.use("/quizzes", quizRoutes);
+router.use("/exercises", exerciseRoutes);
+
 
 export default router;
