@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import * as exerciseService from "../services/ExerciseService";
+import * as exerciseService from "../services/exerciseService";
 import { startSession } from "mongoose";
 
 //-------------------------------------------------------
