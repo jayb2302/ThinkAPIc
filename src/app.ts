@@ -1,7 +1,7 @@
 import express, { Application } from "express";
 import dotenvFlow from "dotenv-flow";
 import cors from "cors";
-import { connectDB } from "./config/database";
+import { testConnection } from "./config/database";
 import routes from "./routes";
 import { setupDocs } from "./swagger";
 import { errorHandler } from "./utils/errorHandlers";
@@ -32,7 +32,7 @@ app.use("/api", routes);
 app.use(errorHandler);
 export function startServer() {
   // Connect to MongoDB
-  connectDB();
+  testConnection();
 
   // Setup Swagger Docs
   setupDocs(app);

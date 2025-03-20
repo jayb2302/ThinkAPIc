@@ -11,7 +11,7 @@ const router: Router = Router();
 
 // Base API route
 router.get("/", (req: Request, res: Response) => {
-    res.status(200).send("Welcome to the ThinkAPIc");
+    res.status(200).send({message: 'Welcome to the ThinkAPIc'});
 });
 
 
