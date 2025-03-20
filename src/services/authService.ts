@@ -2,15 +2,12 @@ import User from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { IUser } from "../interfaces/IUser";
+import { loginSchema, registerSchema } from "../utils/validationSchemas";
+import { connectDB } from "../config/database";
 
 //------------------------
 // Validation Functions
 //------------------------
-
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-  return emailRegex.test(email);
-};
 
 const verifyPassword = async (
   userPassword: string,
@@ -54,21 +51,35 @@ export const registerUser = async (
   password: string,
   role: string = "student"
 ): Promise<IUser> => {
-  if (!validateEmail(email)) {
-    throw new Error("Invalid email address");
-  }
-
-  await checkUserExists(email);
-
-  const hashedPassword = await hashPassword(password);
-
-  const user = await User.create({
+  const { error, value } = registerSchema.validate({
     username,
     email,
-    password: hashedPassword,
+    password,
     role,
   });
-  const userResponse = await User.findById(user._id).select("-createdAt -updatedAt -__v");
+
+  if (error) {
+    const validationError: any = new Error(
+      `Validation error: ${error.message}`
+    );
+    validationError.status = 400;
+    throw validationError;
+  }
+
+  await connectDB();
+  await checkUserExists(value.email);
+
+  const hashedPassword = await hashPassword(value.password);
+
+  const user = await User.create({
+    username: value.username,
+    email: value.email,
+    password: hashedPassword,
+    role: value.role,
+  });
+  const userResponse = await User.findById(user._id).select(
+    "-createdAt -updatedAt -__v"
+  );
   return userResponse as IUser;
 };
 
@@ -76,10 +87,21 @@ export const loginUser = async (
   email: string,
   password: string
 ): Promise<{ token: string; user: IUser }> => {
-  const user = await User.findOne({ email });
-  if (!user || !(await verifyPassword(user.password, password))) {
-    const error: any = new Error("Invalid credentials - Email or password is incorrect");
-    error.status = 401; 
+  const { error, value } = loginSchema.validate({ email, password });
+  if (error) {
+    const validationError: any = new Error(
+      `Validation error: ${error.message}`
+    );
+    validationError.status = 400;
+    throw validationError;
+  }
+
+  const user = await User.findOne({ email: value.email });
+  if (!user || !(await verifyPassword(user.password, value.password))) {
+    const error: any = new Error(
+      "Invalid credentials - Email or password is incorrect"
+    );
+    error.status = 401;
     throw error;
   }
 

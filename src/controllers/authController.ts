@@ -9,7 +9,7 @@ export const register = async (
   try {
     const { username, email, password, role } = req.body;
     const user = await registerUser(username, email, password, role);
-    res.status(201).json({ message: "User registered successfully", user });
+    res.status(201).json({ error:null, message: "User registered successfully", user });
   } catch (error) {
     next(error);
   }
@@ -21,6 +21,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     const { token, user } = await loginUser(email, password);
     res.status(200).json({
       message: "✅ Login successful",
+      error: null,
       token,
       user: {
         _id: user._id,

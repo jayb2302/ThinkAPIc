@@ -1,7 +1,8 @@
 import { Types } from "mongoose";
 import { IUser } from "../interfaces/IUser";
 import User from "../models/User";
-import { validateEmail, checkUserExists, hashPassword } from "./authService";
+import { checkUserExists, hashPassword } from "./authService";
+import { registerSchema } from "../utils/validationSchemas";
 
 //----------------------------------------------------------------
 // Validation Functions
@@ -56,19 +57,20 @@ export const createUser = async (
   password: string,
   role: string = "student"
 ): Promise<IUser> => {
-  if (!validateEmail(email)) {
-    throw new Error("Invalid email address");
+  const { error, value } = registerSchema.validate({ username, email, password, role });
+  if (error) {
+    throw new Error(`Validation error: ${error.message}`);
   }
 
-  await checkUserExists(email);
+  await checkUserExists(value.email);
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword(value.password);
 
   const user = await User.create({
-    username,
-    email,
+    username: value.username,
+    email: value.email,
     password: hashedPassword,
-    role,
+    role: value.role,
   });
 
   return user;
