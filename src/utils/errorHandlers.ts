@@ -7,7 +7,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ): void => {
-  console.error("❌ Error:", err);
+  //console.error("❌ Error:", err);
 
   // Handle MongoDB duplicate key error 
   if (err instanceof MongoServerError && err.code === 11000) {
