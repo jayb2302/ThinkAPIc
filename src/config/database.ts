@@ -3,17 +3,7 @@ import dotenvFlow from "dotenv-flow";
 
 dotenvFlow.config();
 
-const MONGO_URI = process.env.MONGO_URI || "";
-
-// export async function connectDB() {
-//     try {
-//         await mongoose.connect(MONGO_URI); 
-//         console.log("✅ MongoDB Connected!");
-//     } catch (error) {
-//         console.error("❌ MongoDB Connection Failed:", error);
-//         process.exit(1);
-//     }
-// }
+const MONGO_URI = process.env.MONGO_URI_LOCAL || process.env.MONGO_URI || "";
 
 export async function testConnection() {
     try {
@@ -37,7 +27,7 @@ export async function connectDB() {
         // ping the server to check if we have a connection
         if (mongoose.connection.db) {
             await mongoose.connection.db.admin().command({ ping: 1});
-            console.log('✅ Connection established');
+            console.log(`✅ Connection established (${MONGO_URI.includes('localhost') ? 'Local' : 'Remote'})`);
         }
         else {
             throw new Error('❌ Database connection is not established');
