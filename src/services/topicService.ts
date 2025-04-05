@@ -103,6 +103,27 @@ export const updateTopic = async (
     throw new Error(validationError);
   }
 
+  const existingTopic = await Topic.findById(id);
+  if (!existingTopic) {
+    throw new Error("Topic not found.");
+  }
+
+  // Check if course is being changed
+  const oldCourseId = existingTopic.course?.toString();
+  const newCourseId = data.course?.toString();
+
+  if (newCourseId && oldCourseId !== newCourseId) {
+    // Remove topic ID from old course
+    await Course.findByIdAndUpdate(oldCourseId, {
+      $pull: { topics: existingTopic._id },
+    });
+
+    // Add topic ID to new course
+    await Course.findByIdAndUpdate(newCourseId, {
+      $addToSet: { topics: existingTopic._id },
+    });
+  }
+
   return Topic.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,
