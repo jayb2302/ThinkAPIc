@@ -72,7 +72,7 @@ const createTopics = async (
   try {
     const createdTopics = await Promise.all(
       topicsData.map(async (topicData) => {
-        const createdTopic = await createTopic(topicData, session);
+        const createdTopic = await createTopic(topicData);
         return createdTopic._id;
       })
     );

@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import * as topicService from "../services/topicService";
-import { startSession } from "mongoose";
 
 //-------------------------------------------------------
 // Topic Controller Functions
@@ -28,21 +27,11 @@ export const getTopicById: RequestHandler = async (req, res): Promise<void> => {
 };
 
 export const createTopic: RequestHandler = async (req, res, next): Promise<void> => {
-  const session = await startSession(); 
-  session.startTransaction();
-
   try {
-    const newTopic = await topicService.createTopic(req.body, session);
-
-    // Commit the transaction
-    await session.commitTransaction();
-
-    res.status(201).json(newTopic); 
+    const newTopic = await topicService.createTopic(req.body);
+    res.status(201).json(newTopic);
   } catch (error) {
-    await session.abortTransaction();
-    next(error); 
-  } finally {
-    session.endSession();
+    next(error);
   }
 };
 

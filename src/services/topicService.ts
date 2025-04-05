@@ -1,4 +1,5 @@
 import Topic from "../models/Topic";
+import Course from "../models/Course";
 import { ITopic, Resource } from "../interfaces/ITopic";
 
 // ------------------------------------------------
@@ -70,8 +71,7 @@ export const getTopicById = async (id: string): Promise<ITopic | null> => {
 };
 
 export const createTopic = async (
-  topicData: ITopic,
-  session: any
+  topicData: ITopic
 ): Promise<ITopic> => {
   try {
     const error = hasMissingFields(topicData) || validateTopic(topicData);
@@ -79,7 +79,13 @@ export const createTopic = async (
     await validateTopicExists(topicData.title);
 
     const newTopic = new Topic(topicData);
-    await newTopic.save({ session });
+    await newTopic.save();
+
+    await Course.findByIdAndUpdate(
+      newTopic.course,
+      { $push: { topics: newTopic._id } },
+      { new: true }
+    );
 
     return newTopic;
   } catch (error) {
