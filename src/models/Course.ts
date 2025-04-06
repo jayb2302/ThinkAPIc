@@ -4,7 +4,7 @@ import { ICourse } from "../interfaces/ICourse";
 const CourseSchema = new Schema<ICourse>({
     title: { type: String, required: true, unique: true },
     description: { type: String, required: true },
-    teacher: { type: String, required: true },
+    teacher: { type: Schema.Types.ObjectId, ref: "User", required: true },
     scope: { type: String, required: true }, 
     semester: { type: String, required: true }, 
     learningObjectives: [{ type: String, required: true }],
