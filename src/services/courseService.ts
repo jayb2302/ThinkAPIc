@@ -3,6 +3,7 @@ import { ICourse } from "../interfaces/ICourse";
 import Course from "../models/Course";
 import { ITopic } from "../interfaces/ITopic";
 import { Types } from "mongoose";
+import User from "../models/User"; // Import User model
 
 //----------------------------------------------------------------
 // Validation Functions
@@ -49,6 +50,13 @@ const handleError = (message: string, error: any) => {
   throw new Error(message);
 };
 
+const validateTeacherIsAdmin = async (teacherId: string): Promise<void> => {
+  const teacherUser = await User.findById(teacherId);
+  if (!teacherUser || teacherUser.role !== "admin") {
+    throw new Error("Teacher must be a user with admin role.");
+  }
+};
+
 //----------------------------------------------------------------
 // Create and Save Helpers
 //----------------------------------------------------------------
@@ -57,17 +65,16 @@ const createEntityWithSession = async <T>(
   session: any,
   operationName: string
 ): Promise<T> => {
-  return handleDatabaseOperation(entity.save({ session }), operationName);
+  return handleDatabaseOperation(entity.save(), operationName);
 };
 
-const createNewCourse = async (courseData: Partial<ICourse>, session: any) => {
+const createNewCourse = async (courseData: Partial<ICourse>): Promise<ICourse> => {
   const newCourse = new Course(courseData);
-  return await createEntityWithSession<ICourse>(newCourse, session, "create course");
+  return await createEntityWithSession<ICourse>(newCourse, null, "create course");
 };
 
 const createTopics = async (
-  topicsData: ITopic[],
-  session: any
+  topicsData: ITopic[]
 ): Promise<Types.ObjectId[]> => {
   try {
     const createdTopics = await Promise.all(
@@ -101,31 +108,27 @@ export const createCourseWithTopics = async (
   if (validationError) throw new Error(validationError);
   validateTopicsData(topicsData);
 
+  if (!courseData.teacher) {
+    throw new Error("Teacher ID is required.");
+  }
+  await validateTeacherIsAdmin(courseData.teacher.toString());
+
   // Check if course already exists by title
   if (await checkCourseExists(courseData.title!)) {
     throw new Error("A course with this title already exists.");
   }
-  // Start session for transaction
-  const session = await Course.startSession();
-  session.startTransaction();
 
   try {
-    const createdCourse = await createNewCourse(courseData, session);
+    const createdCourse = await createNewCourse(courseData);
 
-    const createdTopicIds = await createTopics(topicsData, session);
+    const createdTopicIds = await createTopics(topicsData);
 
-    // Save course with associated topics
     createdCourse.topics = createdTopicIds;
-    await createEntityWithSession<ICourse>(createdCourse, session, "Update course with topics");
-
-    await session.commitTransaction();
-    session.endSession();
+    await createdCourse.save();
 
     return createdCourse;
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;  
+    throw error;
   }
 };
 
