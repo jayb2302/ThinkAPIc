@@ -1,5 +1,5 @@
 import express from "express";
-import { getUsers, getUserById, createUser, updateUserRole, updateUserProfile, deleteUser } from "../controllers/userController";
+import { getUsers, getUserById, createUser, updateUserRole, updateUserProfile, deleteUser, getAdminUsers } from "../controllers/userController";
 import { authenticateUser, authorizeAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
@@ -14,6 +14,37 @@ const router = express.Router();
 // ------------------------------------------
 // 🔐 Admin Routes
 // ------------------------------------------
+/**
+ * @swagger
+ * /users/admins:
+ *   get:
+ *     summary: Get all users with admin role
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all admin users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: "643abc123def4567890aaa11"
+ *                   username:
+ *                     type: string
+ *                     example: "adminUser"
+ *       401:
+ *         description: Unauthorized - No token provided
+ *       403:
+ *         description: Forbidden - Only admins can access
+ */
+router.get("/admins", authenticateUser, authorizeAdmin, getAdminUsers);
+
 /**
  * @swagger
  * /users:

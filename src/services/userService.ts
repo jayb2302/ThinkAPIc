@@ -22,6 +22,10 @@ export const getUserById = async (id: string): Promise<IUser | null> => {
   return await User.findById(id);
 };
 
+export const getAdminUsers = async (): Promise<IUser[]> => {
+  return await User.find({ role: "admin" }).select("_id username").exec();
+};
+
 export const updateUserRole = async (
   userId: string,
   newRole: "student" | "admin"
