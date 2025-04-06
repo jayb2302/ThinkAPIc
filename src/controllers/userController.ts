@@ -33,6 +33,20 @@ export const getUserById: RequestHandler = async (
   }
 };
 
+// Get all admin users
+export const getAdminUsers: RequestHandler = async (
+  req,
+  res,
+  next
+): Promise<void> => {
+  try {
+    const admins = await userService.getAdminUsers();
+    res.status(200).json(admins);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Create a new user
 export const createUser: RequestHandler = async (
   req,
@@ -107,3 +121,5 @@ export const deleteUser: RequestHandler = async (
     next(error); 
   }
 };
+
+
