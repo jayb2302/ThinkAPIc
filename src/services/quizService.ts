@@ -118,7 +118,7 @@ const getQuizWithTopic = async (
 };
 
 export const getAllQuizzes = async (): Promise<IQuiz[]> => {
-  const quizzes = await Quiz.find().populate('_id');
+  const quizzes = await Quiz.find().populate('topic', '_id, title');
   quizzes.forEach((quiz) => quiz.options.sort((a, b) => a.order - b.order));
   return quizzes;
 };
