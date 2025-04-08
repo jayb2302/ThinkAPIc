@@ -99,7 +99,7 @@ router.get("/", authenticateUser, authorizeAdmin, getUsers);
  *       404:
  *         description: User not found
  */
-router.get("/:id", authenticateUser, authorizeAdmin, getUserById);
+router.get("/:id", authenticateUser, getUserById);
 
 /**
  * @swagger

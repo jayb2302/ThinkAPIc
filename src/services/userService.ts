@@ -19,7 +19,7 @@ export const getAllUsers = async (): Promise<IUser[]> => {
 };
 
 export const getUserById = async (id: string): Promise<IUser | null> => {
-  return await User.findById(id);
+  return await User.findById(id).select("_id username email").exec();
 };
 
 export const getAdminUsers = async (): Promise<IUser[]> => {
