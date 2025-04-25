@@ -4,7 +4,7 @@ import { IProgressLog, ActivityType ,ActivityTable } from "../interfaces/IProgre
 const ProgressLogSchema = new Schema<IProgressLog>({
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     course: { type: Schema.Types.ObjectId, ref: "Course", required: true },
-    topic: { type: Schema.Types.ObjectId },
+    topic: { type: mongoose.Schema.Types.ObjectId, ref: 'Topic', required: true },
     activityType: { 
         type: String, 
         enum: Object.values(ActivityType),

@@ -5,7 +5,19 @@ import { AuthenticatedRequest } from "../middleware/authMiddleware";
 // Get all progress logs
 export const getProgressLogs: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
-        const logs = await ProgressLog.find().populate("user").populate("course");
+        const logs = await ProgressLog.find()
+            .populate({
+              path: 'user',
+              select: '_id username' 
+            })
+            .populate({
+              path: 'course',
+              select: '_id title' 
+            })
+            .populate({
+              path: 'topic',
+              select: '_id title' 
+            });
         res.status(200).json(logs);
     } catch (error) {
         console.error("❌ Failed to fetch progress logs:", error);
@@ -17,7 +29,19 @@ export const getProgressLogs: RequestHandler = async (req: AuthenticatedRequest,
 export const getUserProgress: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
         const { userId } = req.params;
-        const logs = await ProgressLog.find({ user: userId }).populate("course");
+        const logs = await ProgressLog.find({ user: userId })
+            .populate({
+              path: 'user',
+              select: '_id username'
+            })
+            .populate({
+              path: 'course',
+              select: '_id title'
+            })
+            .populate({
+              path: 'topic',
+              select: '_id title'
+            });
         res.status(200).json(logs);
     } catch (error) {
         console.error("❌ Failed to fetch user progress:", error);
@@ -28,11 +52,12 @@ export const getUserProgress: RequestHandler = async (req: AuthenticatedRequest,
 // Add a new progress log
 export const addProgressLog: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
-        const { user, course, activityType, activityTable, activityId } = req.body;
+        const { user, course, topic, activityType, activityTable, activityId } = req.body;
 
         const newLog = await ProgressLog.create({
             user,
             course,
+            topic,
             activityType,
             activityTable,
             activityId,
