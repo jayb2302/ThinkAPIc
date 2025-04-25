@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
 import ProgressLog from "../models/ProgressLog";
-import { AuthRequest } from "../middleware/authMiddleware";
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
 
 // Get all progress logs
-export const getProgressLogs: RequestHandler = async (req: AuthRequest, res) => {
+export const getProgressLogs: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
         const logs = await ProgressLog.find().populate("user").populate("course");
         res.status(200).json(logs);
@@ -14,7 +14,7 @@ export const getProgressLogs: RequestHandler = async (req: AuthRequest, res) => 
 };
 
 // Get progress log by user
-export const getUserProgress: RequestHandler = async (req: AuthRequest, res) => {
+export const getUserProgress: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
         const { userId } = req.params;
         const logs = await ProgressLog.find({ user: userId }).populate("course");
@@ -26,7 +26,7 @@ export const getUserProgress: RequestHandler = async (req: AuthRequest, res) => 
 };
 
 // Add a new progress log
-export const addProgressLog: RequestHandler = async (req: AuthRequest, res) => {
+export const addProgressLog: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
         const { user, course, activityType, activityTable, activityId } = req.body;
 

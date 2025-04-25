@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { registerUser, loginUser } from "../services/authService";
+import { registerUser, loginUser, verifyAndGetUser } from "../services/authService";
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
+
+
 
 export const register = async (
   req: Request,
@@ -32,6 +35,15 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     });
   } catch (error) {
     console.error("❌ Login Error:", error);
+    next(error);
+  }
+};
+
+export const getCurrentUser = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const user = req.user;
+    res.status(200).json({ user });
+  } catch (error) {
     next(error);
   }
 };

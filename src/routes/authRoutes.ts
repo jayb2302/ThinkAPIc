@@ -1,5 +1,6 @@
 import express from "express";
-import { register, login } from "../controllers/authController";
+import { register, login, getCurrentUser } from "../controllers/authController";
+import { authenticateUser } from "../middleware/authMiddleware";
 
 const router = express.Router();
 /**
@@ -98,5 +99,29 @@ router.post("/register", register);
  *         description: Server error
  */
 router.post("/login", login);
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get the currently authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The current authenticated user's data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   example: { "_id": "string", "username": "username", "email": "email", "role": "student" }
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/me", authenticateUser, getCurrentUser);
 
 export default router;

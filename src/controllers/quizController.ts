@@ -1,5 +1,5 @@
 import { RequestHandler, NextFunction } from "express";
-import { AuthRequest } from "../middleware/authMiddleware";
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import * as quizService from "../services/quizService";
 
 // Get all quizzes
@@ -71,7 +71,7 @@ export const getUserQuizProgress: RequestHandler = async (req, res, next): Promi
 
 // Create a new quiz
 export const createQuiz: RequestHandler = async (
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res,
   next
 ): Promise<void> => {
@@ -91,7 +91,7 @@ export const createQuiz: RequestHandler = async (
 
 // Update a quiz
 export const updateQuiz: RequestHandler = async (
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res,
   next
 ): Promise<void> => {
@@ -113,7 +113,7 @@ export const updateQuiz: RequestHandler = async (
 };
 // Delete a quiz
 export const deleteQuiz: RequestHandler = async (
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res,
   next
 ): Promise<void> => {
@@ -131,7 +131,7 @@ export const deleteQuiz: RequestHandler = async (
 
 // Attempt a quiz
 export const attemptQuiz: RequestHandler = async (
-  req: AuthRequest,
+  req: AuthenticatedRequest,
   res,
   next
 ): Promise<void> => {

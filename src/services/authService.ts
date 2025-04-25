@@ -109,3 +109,12 @@ export const loginUser = async (
 
   return { token, user };
 };
+
+export const verifyAndGetUser = async (token: string) => {
+  const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
+  const user = await User.findById(decoded.userId).select('_id username email role');
+  if (!user) {
+    throw new Error('User not found');
+  }
+  return user;
+};
