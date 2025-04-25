@@ -3,7 +3,7 @@ import dotenvFlow from "dotenv-flow";
 
 dotenvFlow.config();
 
-const MONGO_URI = process.env.MONGO_URI_LOCAL || process.env.MONGO_URI || "";
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URI_LOCAL ||  "";
 
 export async function testConnection() {
     try {
