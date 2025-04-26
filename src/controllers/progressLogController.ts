@@ -52,7 +52,7 @@ export const getUserProgress: RequestHandler = async (req: AuthenticatedRequest,
 // Add a new progress log
 export const addProgressLog: RequestHandler = async (req: AuthenticatedRequest, res) => {
     try {
-        const { user, course, topic, activityType, activityTable, activityId } = req.body;
+        const { user, course, topic, activityType, activityTable, activityId, isCorrect, } = req.body;
 
         const newLog = await ProgressLog.create({
             user,
@@ -61,6 +61,7 @@ export const addProgressLog: RequestHandler = async (req: AuthenticatedRequest, 
             activityType,
             activityTable,
             activityId,
+            isCorrect,
         });
 
         res.status(201).json(newLog);
