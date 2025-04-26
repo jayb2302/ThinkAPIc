@@ -138,11 +138,11 @@ export const attemptQuiz: RequestHandler = async (
   try {
 
     const quizId = req.params.id;
-    const { selectedOptionOrder, courseId } = req.body;
+    const { selectedOptionOrder, courseId, isCorrect } = req.body;
     const userId = req.user!._id;
 
     console.log("📌 Quiz Attempt Request:", { userId, quizId, selectedOptionOrder, courseId });
-    const result = await quizService.attemptQuiz(quizId, { userId, selectedOptionOrder, courseId });
+    const result = await quizService.attemptQuiz(quizId, { userId, selectedOptionOrder, courseId, isCorrect });
 
     res.status(201).json({
       message: '✅ Quiz attempt logged successfully',

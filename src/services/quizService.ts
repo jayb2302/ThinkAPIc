@@ -188,10 +188,12 @@ export const attemptQuiz = async (
     userId,
     selectedOptionOrder,
     courseId,
+    isCorrect,
   }: {
     userId: string;
     selectedOptionOrder: number;
     courseId: string;
+    isCorrect: boolean;
   }
 ): Promise<{
   message: string;
@@ -224,6 +226,7 @@ export const attemptQuiz = async (
     activityTable: "quizzes",
     activityId: quiz._id,
     completedAt: new Date(),
+    isCorrect: isCorrect,
   });
 
   return {
