@@ -26,4 +26,5 @@ export interface IProgressLog extends Document {
     activityTable: ActivityTable;
     activityId: Types.ObjectId;
     completedAt: Date;
+    isCorrect: boolean;
 }

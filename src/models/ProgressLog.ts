@@ -17,6 +17,7 @@ const ProgressLogSchema = new Schema<IProgressLog>({
     }, 
     activityId: { type: Schema.Types.ObjectId, required: true, index: true },
     completedAt: { type: Date, default: Date.now },
+    isCorrect: { type: Boolean, required: true },
 }, { timestamps: true });
 
 export default mongoose.model<IProgressLog>("ProgressLog", ProgressLogSchema);
