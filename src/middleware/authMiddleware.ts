@@ -6,6 +6,7 @@ export interface AuthUser {
   _id: string;
   email: string;
   role: 'student' | 'admin';
+  username: string;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -33,7 +34,7 @@ export const authenticateUser = async (req: AuthenticatedRequest, res: Response,
         };
         console.log("✅ Decoded JWT:", decoded);
 
-        const user = await User.findById(decoded.userId).select('_id email role');
+        const user = await User.findById(decoded.userId).select('_id email role username');
         if (!user) {
             res.status(404).json({ error: "User not found" });
             return;
@@ -43,6 +44,7 @@ export const authenticateUser = async (req: AuthenticatedRequest, res: Response,
             _id: user._id.toString(),
             email: user.email,
             role: user.role as "student" | "admin",
+            username: user.username,
         };
         next();
     } catch (error) {
