@@ -1,6 +1,7 @@
 import Topic from "../models/Topic";
 import Course from "../models/Course";
 import { ITopic, Resource } from "../interfaces/ITopic";
+import { Types } from "mongoose";
 
 // ------------------------------------------------
 // Helper Functions
@@ -108,6 +109,10 @@ export const updateTopic = async (
     throw new Error("Topic not found.");
   }
 
+  if (data.course && typeof data.course === 'string') {
+    data.course = Types.ObjectId.createFromHexString(data.course);
+  }
+  
   // Check if course is being changed
   const oldCourseId = existingTopic.course?.toString();
   const newCourseId = data.course?.toString();
