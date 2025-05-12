@@ -148,9 +148,11 @@ const validateExerciseAttempt = (
     {
       userId,
       courseId,
+      isCorrect,
     }: {
       userId: string;
       courseId: string;
+      isCorrect: boolean;
     }
   ): Promise<{ message: string; topicId: string | null }> => {
     // Validate required fields
@@ -178,6 +180,7 @@ const validateExerciseAttempt = (
       activityTable: ActivityTable.EXERCISES,
       activityId: exercise._id,
       completedAt: new Date(),
+      isCorrect,
     });
   
     return {

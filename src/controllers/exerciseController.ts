@@ -100,6 +100,7 @@ export const logExerciseAttempt: RequestHandler = async (req, res) => {
     const result = await exerciseService.attemptExercise(exerciseId, {
       userId,
       courseId,
+      isCorrect: true,
     });
     res.status(200).json(result);
   } catch (error: any) {
