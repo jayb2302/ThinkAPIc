@@ -33,7 +33,7 @@ const generateToken = (userId: string, role: string): string => {
     throw new Error("Server misconfiguration: JWT_SECRET is missing");
   }
 
-  return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: "8h" });
 };
 
 export const hashPassword = async (password: string): Promise<string> => {
