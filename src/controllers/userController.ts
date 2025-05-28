@@ -78,8 +78,6 @@ export const updateUserRole: RequestHandler = async (
   try {
     const { id } = req.params;
     const { newRole } = req.body;
-
-    console.log("Received userId:", id);
     const updatedUser = await userService.updateUserRole(id, newRole);
     res
       .status(200)
@@ -121,5 +119,3 @@ export const deleteUser: RequestHandler = async (
     next(error); 
   }
 };
-
-
