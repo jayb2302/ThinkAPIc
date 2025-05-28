@@ -15,11 +15,12 @@ export const authenticateUser = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void | Response> => {
+): Promise<void> => {
   const authHeader = req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Unauthorized: No Token Provided" });
+    res.status(401).json({ error: "Unauthorized: No Token Provided" });
+    return;
   }
 
   const token = authHeader.split(" ")[1];
@@ -33,7 +34,8 @@ export const authenticateUser = async (
       "_id email role username"
     );
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      res.status(404).json({ error: "User not found" });
+      return;
     }
 
     req.user = {
@@ -45,7 +47,8 @@ export const authenticateUser = async (
     next();
   } catch (error) {
     //console.error("❌ Token Verification Failed:", error);
-    return res.status(403).json({ error: "Invalid or Expired Token" });
+    res.status(403).json({ error: "Invalid or Expired Token" });
+    return;
   }
 };
 
@@ -54,9 +57,10 @@ export const authorizeAdmin = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void | Response => {
+): void => {
   if (!req.user || req.user.role !== "admin") {
-    return res.status(403).json({ error: "Forbidden: Admins only" });
+    res.status(403).json({ error: "Forbidden: Admins only" });
+    return;
   }
   next();
 };
