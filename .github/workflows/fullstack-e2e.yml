@@ -1,0 +1,76 @@
+name: Fullstack E2E Test
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  fullstack-e2e:
+    name: Frontend + Backend Integration Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Backend Repo (This repo)
+        uses: actions/checkout@v4
+        with:
+          path: backend
+
+      - name: Checkout Frontend Repo
+        uses: actions/checkout@v4
+        with:
+          repository: jayb2302/ThinkAPIc-Frontend
+          path: frontend
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install global deps
+        run: npm install -g concurrently wait-on
+
+      - name: Install Backend
+        run: |
+          cd backend
+          npm install
+      
+      - name: Create .env.test for CI
+        run: |
+          echo "MONGO_URI=${{ secrets.CI_MONGO_URI }}" > backend/.env.test
+          echo "DB_NAME=thinkapic-test" >> backend/.env.test
+          echo "CLIENT_URL=${{ secrets.CI_CLIENT_URL }}" >> backend/.env.test
+          echo "JWT_SECRET=${{ secrets.CI_JWT_SECRET }}" >> backend/.env.test
+
+      - name: Install Frontend
+        run: |
+          cd frontend
+          npm install
+          echo "VITE_API_BASE_URL=http://localhost:4000/api" > .env
+          echo "VITE_BASE_URL=http://localhost:5173" >> .env
+
+      - name: Start Backend + Frontend in background
+        run: |
+          nohup bash -c "cd backend && npm run test-dev" > backend.log 2>&1 &
+          nohup bash -c "cd frontend && npm run dev" > frontend.log 2>&1 &
+
+      - name: Wait for Frontend + Backend to be Ready
+        run: |
+          npx wait-on http://localhost:5173
+          npx wait-on http://localhost:4000/api
+
+      - name: Run Frontend Unit Tests
+        run: |
+          cd frontend
+          npm run test
+
+      - name: Install Playwright Browsers with Dependencies
+        run: |
+          cd backend
+          npx playwright install --with-deps
+
+      - name: Run Playwright E2E Tests
+        run: |
+          cd backend
+          NODE_ENV=test npx playwright test --reporter=list

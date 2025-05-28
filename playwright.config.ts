@@ -35,9 +35,24 @@ export default defineConfig({
   },
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: "npm run testdb",
-    url: "http://localhost:4000/api",
-    reuseExistingServer: false,
-  },
+  webServer: [
+    {
+      command: "npm run testdb",
+      url: "http://localhost:4000/api",
+      reuseExistingServer: true,
+      timeout: 120 * 1000,
+      env: {
+        NODE_ENV: "test",
+        CLIENT_URL: "http://localhost:5173",
+        PORT: "4000",
+      },
+    },
+    {
+      command: "npm run dev",
+      cwd: "../frontend",
+      url: "http://localhost:5173",
+      reuseExistingServer: true,
+      timeout: 120 * 1000,
+    },
+  ],
 });

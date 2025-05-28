@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import dotenvFlow from "dotenv-flow";
 import Course from "../models/Course";
 import Topic from "../models/Topic";
+import Quiz from "../models/Quiz";
+import User from "../models/User";
 
 // Load environment variables
 dotenvFlow.config();
@@ -11,153 +13,112 @@ const MONGO_URI = process.env.MONGO_URI as string;
 
 async function seedDatabase() {
   try {
-    // ✅ Connect to MongoDB
     await mongoose.connect(MONGO_URI);
     console.log("✅ Connected to MongoDB");
 
-    // ✅ Clear existing data
     await Topic.deleteMany({});
     await Course.deleteMany({});
+    await Quiz.deleteMany({});
+
     console.log("🗑️ Existing data cleared");
 
-    // ✅ Create API Course
-    const apiCourse = await Course.create({
-      title: "REST API Development",
-      description: "The purpose of this course is to introduce and train students in REST API development, including API design, implementation, and testing.",
-      teacher: "Søren Spangsberg Jørgensen",
-      scope: "5 ECTS",
-      semester: "2nd Semester",
-      learningObjectives: [
-        "Understand API and REST API concepts",
-        "Learn how REST APIs fit into web development",
-        "Understand HTTP methods, requests, and responses",
-        "Design and document APIs using OpenAPI (Swagger)"
-      ],
-      skills: [
-        "Design and implement REST APIs",
-        "Query data from a REST API",
-        "Secure and test a REST API",
-        "Deploy an API to a cloud platform"
-      ],
-      competencies: [
-        "Choose a suitable tech stack for REST API development",
-        "Apply knowledge and skills to real-world API solutions",
-        "Collaborate in REST API development",
-        "Optimize API performance and security"
-      ],
+    const adminUser = await User.create({
+      username: "admin",
+      email: "admin@example.com",
+      password: "admin1234",
+      role: "admin",
     });
 
-    console.log(`📚 Created Course: ${apiCourse.title}`);
+    console.log(`👤 Created admin user: ${adminUser.username}`);
 
-    // ✅ Insert Topics & Collect their IDs
-    const topics = await Topic.insertMany([
+    const course = await Course.create({
+      title: "REST API Fundamentals",
+      description: "Introductory course to REST APIs.",
+      teacher: adminUser._id,
+      scope: "5 ECTS",
+      semester: "1st Semester",
+      learningObjectives: ["Understand what REST APIs are"],
+      skills: ["Define and explain REST", "Use HTTP methods"],
+      competencies: ["Apply REST principles"],
+    });
+
+    const topic = await Topic.create({
+      title: "REST Basics",
+      week: 1,
+      summary: "Foundational knowledge of REST.",
+      key_points: ["REST definition", "HTTP methods", "Statelessness"],
+      resources: [
+        {
+          title: "REST on MDN",
+          link: "https://developer.mozilla.org/en-US/docs/Web/HTTP/REST",
+        },
+      ],
+      course: course._id,
+    });
+
+    const quizzes = await Quiz.insertMany([
       {
-        title: "Introduction to REST API",
-        week: 5,
-        summary: "Understanding REST APIs and their role in web development.",
-        key_points: [
-          "What is an API?",
-          "What is REST and why is it important?",
-          "The Six REST Constraints",
-          "Exploring Public REST APIs",
-        ],
-        resources: [
+        question: "What does REST stand for?",
+        topic: topic._id,
+        options: [
+          { text: "Rapid Execution System Task", isCorrect: false, order: 1 },
           {
-            title: "REST API Basics - MDN",
-            link: "https://developer.mozilla.org/en-US/docs/Web/HTTP/REST",
+            text: "Representational State Transfer",
+            isCorrect: true,
+            order: 2,
           },
+          { text: "Remote Exchange Secure Token", isCorrect: false, order: 3 },
+          { text: "Read Execute Store Transfer", isCorrect: false, order: 4 },
         ],
-        course: apiCourse._id,
       },
       {
-        title: "HTTP Methods & CRUD Operations",
-        week: 6,
-        summary: "Understanding GET, POST, PUT, DELETE and HTTP status codes.",
-        key_points: [
-          "GET retrieves data from the server.",
-          "POST creates new data.",
-          "PUT updates existing data.",
-          "DELETE removes data from the server.",
-          "Common HTTP status codes (200, 201, 400, 404, 500)",
+        question: "Which HTTP method retrieves data?",
+        topic: topic._id,
+        options: [
+          { text: "POST", isCorrect: false, order: 1 },
+          { text: "GET", isCorrect: true, order: 2 },
+          { text: "PUT", isCorrect: false, order: 3 },
+          { text: "DELETE", isCorrect: false, order: 4 },
         ],
-        resources: [
-          {
-            title: "HTTP Methods - MDN",
-            link: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods",
-          },
-        ],
-        course: apiCourse._id,
       },
       {
-        title: "User Authentication & JWT",
-        week: 8,
-        summary: "Securing your API using JSON Web Tokens (JWT).",
-        key_points: [
-          "What is JWT?",
-          "How to implement user authentication",
-          "Protecting routes with JWT",
-          "Testing authentication with Postman",
+        question: "Which is a core REST principle?",
+        topic: topic._id,
+        options: [
+          { text: "Stateful communication", isCorrect: false, order: 1 },
+          { text: "Statelessness", isCorrect: true, order: 2 },
+          { text: "SOAP encoding", isCorrect: false, order: 3 },
+          { text: "Session tracking", isCorrect: false, order: 4 },
         ],
-        resources: [
-          {
-            title: "JWT Authentication Guide",
-            link: "https://jwt.io/introduction/",
-          },
-        ],
-        course: apiCourse._id,
       },
       {
-        title: "API Documentation with Swagger",
-        week: 9,
-        summary: "Documenting and testing APIs using Swagger.",
-        key_points: [
-          "What is Swagger?",
-          "Generating API documentation",
-          "Testing API endpoints using Swagger UI",
+        question: "Which status code means OK?",
+        topic: topic._id,
+        options: [
+          { text: "404", isCorrect: false, order: 1 },
+          { text: "200", isCorrect: true, order: 2 },
+          { text: "500", isCorrect: false, order: 3 },
+          { text: "301", isCorrect: false, order: 4 },
         ],
-        resources: [
-          { title: "Swagger Documentation", link: "https://swagger.io/" },
-        ],
-        course: apiCourse._id,
       },
       {
-        title: "GraphQL Introduction",
-        week: 9,
-        summary: "Understanding the differences between REST and GraphQL.",
-        key_points: [
-          "What is GraphQL?",
-          "Differences between REST and GraphQL",
-          "Querying data using GraphQL",
+        question: "Which tool can test REST APIs?",
+        topic: topic._id,
+        options: [
+          { text: "Photoshop", isCorrect: false, order: 1 },
+          { text: "Postman", isCorrect: true, order: 2 },
+          { text: "Excel", isCorrect: false, order: 3 },
+          { text: "Chrome DevTools", isCorrect: false, order: 4 },
         ],
-        resources: [
-          { title: "GraphQL Basics", link: "https://graphql.org/learn/" },
-        ],
-        course: apiCourse._id,
-      },
-      {
-        title: "Final API Presentation & Recap",
-        week: 10,
-        summary: "Presenting your API project and reviewing key concepts.",
-        key_points: [
-          "Showcasing the API features",
-          "Discussing challenges and solutions",
-          "Finalizing API deployment",
-        ],
-        resources: [],
-        course: apiCourse._id,
       },
     ]);
 
-    console.log("✅ Topics Seeded Successfully!");
-
-    // ✅ Update Course with Topics
-    await Course.findByIdAndUpdate(apiCourse._id, {
-      $set: { topics: topics.map(topic => topic._id) }
-    });
-
-    console.log(`📚 Updated Course with Topics: ${apiCourse.title}`);
-
-    // ✅ Close the connection
+    console.log(`📚 Created Course: ${course.title}`);
+    console.log(`📖 Created Topic: ${topic.title}`);
+    console.log(
+      `📝 Created ${quizzes.length} Quizzes for Topic: ${topic.title}`
+    );
+    console.log("✅ Course, Topic and Quizzes Seeded Successfully!");
     mongoose.connection.close();
     console.log("🔌 MongoDB Connection Closed");
   } catch (error) {
@@ -167,4 +128,5 @@ async function seedDatabase() {
 }
 
 // ✅ Run the seed function
-seedDatabase();
+
+export default seedDatabase;
