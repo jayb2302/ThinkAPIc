@@ -93,7 +93,10 @@ const createTopics = async (
 // Service Functions
 //----------------------------------------------------------------
 export const getCourses = async (): Promise<ICourse[]> => {
-  return handleDatabaseOperation(Course.find(), "Fetch courses");
+  return handleDatabaseOperation(
+    Course.find().populate('topics', '_id title'),
+    "Fetch courses"
+  );
 };
 
 export const getCourseById = async (id: string): Promise<ICourse | null> => {
