@@ -39,15 +39,6 @@ jobs:
           echo "DB_NAME=thinkapic-test" >> .env.test
           echo "CLIENT_URL=${{ secrets.CI_CLIENT_URL }}" >> .env.test
           echo "JWT_SECRET=${{ secrets.CI_JWT_SECRET }}" >> .env.test
-      
-      - name: Install system dependencies for Playwright
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 \
-            libxrandr2 libgbm1 libgtk-3-0 libxdamage1 libxfixes3 libasound2 \
-            libdrm2 libxshmfence1 libnspr4 libxss1 libx11-xcb1 libx11-6 \
-            libxcb1 libxtst6
 
       - name: Install, build 
         run: |
