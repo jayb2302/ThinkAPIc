@@ -38,8 +38,8 @@ jobs:
           npm install
           npm run build
           
-      - name: Install Playwright Browsers and Dependencies
-        uses: microsoft/playwright-github-action@v1
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
           
       - name: Run tests
         run: npm test
