@@ -33,12 +33,16 @@ jobs:
         run: |
           echo "${{ secrets.API }}" > .env
 
-      - name: Install, build and test
+      - name: Install, build 
         run: |
           npm install
           npm run build
-          npx playwright install
-          npm test
+          
+      - name: Install Playwright Browsers and Dependencies
+        uses: microsoft/playwright-github-action@v1
+          
+      - name: Run tests
+        run: npm test
 
   deploy:
     name: Deploy
