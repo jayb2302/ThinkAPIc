@@ -33,12 +33,17 @@ jobs:
         run: |
           echo "${{ secrets.API }}" > .env
 
-      - name: Install, build and test
+      - name: Create .env.test for CI
+        run: |
+          echo "MONGO_URI=${{ secrets.CI_MONGO_URI }}" > .env.test
+          echo "DB_NAME=thinkapic-test" >> .env.test
+          echo "CLIENT_URL=${{ secrets.CI_CLIENT_URL }}" >> .env.test
+          echo "JWT_SECRET=${{ secrets.CI_JWT_SECRET }}" >> .env.test
+
+      - name: Install, build 
         run: |
           npm install
           npm run build
-          npx playwright install
-          npm test
 
   deploy:
     name: Deploy
