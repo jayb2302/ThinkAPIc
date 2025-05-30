@@ -68,7 +68,7 @@ jobs:
       - name: Install Playwright Browsers with Dependencies
         run: |
           cd backend
-          npx playwright install --with-deps
+          npx playwright install
 
       - name: Run Playwright E2E Tests
         run: |
