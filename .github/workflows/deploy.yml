@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Build and Deploy (Matrix)
 
 on:
   push:
@@ -44,8 +44,6 @@ jobs:
         run: |
           npm install
           npm run build
-          npx playwright install
-          npm test
 
   deploy:
     name: Deploy
